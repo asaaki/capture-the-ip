@@ -1,0 +1,60 @@
+# https://fly.io/docs/reference/configuration/
+
+app = "cti"
+
+kill_signal = "SIGINT"
+kill_timeout = 16 # a second longer than the app's graceful shutdown timer
+processes = []
+
+[build]
+dockerfile = "Dockerfile"
+build-target = "production"
+
+[deploy]
+strategy = "bluegreen"
+
+[env]
+RUST_LOG = "info"
+RUST_BACKTRACE = "full"
+PORT = "3000"
+HOST_IP = "0.0.0.0"
+
+# is a fly secret: DATABASE_URL = "…"
+# is a fly secret: DATABASE_ADMIN_URL = "…"
+
+# https://neon.tech/docs/connect/connection-pooling/ - 1000 total
+# we have only 3 instances (single process each)
+# during deployments this could go up to 6 in worst case, so still within limits
+DATABASE_POOL_SIZE = "100"
+
+
+[experimental]
+allowed_public_ports = []
+auto_rollback = true
+
+[[services]]
+internal_port = 3000
+protocol = "tcp"
+processes = ["app"]
+http_checks = []
+script_checks = []
+
+[services.concurrency]
+type = "connections"
+hard_limit = 25
+soft_limit = 20
+
+[[services.ports]]
+handlers = ["http"]
+port = 80
+force_https = true
+
+[[services.ports]]
+handlers = ["tls", "http"]
+port = 443
+
+[[services.tcp_checks]]
+interval = "15s"
+timeout = "2s"
+grace_period = "1s"
+restart_limit = 3

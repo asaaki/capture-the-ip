@@ -1,0 +1,11 @@
+/bin
+/target
+/tmp
+/logs
+/node_modules
+
+.gitignore
+docker-compose.yaml
+Dockerfile
+fly.toml
+Makefile

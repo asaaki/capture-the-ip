@@ -1,0 +1,37 @@
+[workspace]
+members = [
+  "cti_constants",
+  "cti_types",
+  "cti_env",
+  "cti_schema",
+  "cti_core",
+  "cti_server",
+  "cti_refresher",
+  "cti_migrate",
+]
+
+[workspace.package]
+version = "0.1.0"
+description = "Capture The IP"
+license = "MIT OR Apache-2.0"
+homepage = "https://github.com/asaaki/capture-the-ip"
+repository = "https://github.com/asaaki/capture-the-ip"
+documentation = "https://github.com/asaaki/capture-the-ip"
+edition = "2021"
+publish = false
+
+# https://fasterthanli.me/articles/why-is-my-rust-build-so-slow
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+incremental = true
+strip = true
+
+# # https://doc.rust-lang.org/cargo/reference/profiles.html#custom-profiles
+# [profile.release-strip]
+# inherits = "release"
+# strip = true
+
+[profile.dev.package."*"]
+opt-level = 3

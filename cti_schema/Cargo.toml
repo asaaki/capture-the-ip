@@ -1,0 +1,13 @@
+[package]
+name = "cti_schema"
+description.workspace = true
+documentation.workspace = true
+edition.workspace = true
+homepage.workspace = true
+license.workspace = true
+publish.workspace = true
+repository.workspace = true
+version.workspace = true
+
+[dependencies]
+diesel = "2.0.2"

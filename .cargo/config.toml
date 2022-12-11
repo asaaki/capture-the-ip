@@ -1,0 +1,41 @@
+[alias]
+b = "build"
+br = "build --release"
+c = "check"
+t = "test"
+r = "run"
+rr = "run --release"
+
+s = "run --package cti_server --release"
+sd = "run --package cti_server"
+
+[env]
+HELLO = { value = "world" }
+
+[target.'cfg(all())']
+rustflags = [
+    # https://github.com/EmbarkStudios/rpmalloc-rs/blob/main/.cargo/config.toml
+    "-Dunsafe_code",
+    "-Wclippy::all",
+    "-Wrust_2018_idioms",
+
+    "-Ctarget-cpu=native",
+]
+
+[target.x86_64-unknown-linux-gnu]
+linker = "/usr/bin/clang"
+rustflags = [
+    "-Clink-arg=-fuse-ld=/usr/local/bin/mold",
+]
+
+[target.x86_64-pc-windows-msvc]
+linker = "lld-link.exe"
+
+rustflags = [
+    # manual steps of `static_vcruntime::metabuild();` (static_vcruntime crate)
+    "-Ctarget-feature=+crt-static",
+    "-Clink-args=/DEFAULTLIB:ucrt.lib /DEFAULTLIB:libvcruntime.lib libcmt.lib",
+    "-Clink-args=/NODEFAULTLIB:libvcruntimed.lib /NODEFAULTLIB:vcruntime.lib /NODEFAULTLIB:vcruntimed.lib",
+    "-Clink-args=/NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:msvcrtd.lib",
+    "-Clink-args=/NODEFAULTLIB:libucrt.lib /NODEFAULTLIB:libucrtd.lib /NODEFAULTLIB:ucrtd.lib",
+]

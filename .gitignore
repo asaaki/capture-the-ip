@@ -1,0 +1,9 @@
+/bin
+/logs
+/target
+/tmp/*
+!/tmp/.keep
+
+.crates.toml
+.crates2.json
+node_modules

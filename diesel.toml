@@ -1,0 +1,13 @@
+# For documentation on how to configure this file,
+# see https://diesel.rs/guides/configuring-diesel-cli
+
+[print_schema]
+file = "cti_schema/src/schema.rs"
+with_docs = true
+import_types = [
+  "diesel::sql_types::*",
+  # "diesel_full_text_search::types::*"
+]
+
+[migrations_directory]
+dir = "migrations"
