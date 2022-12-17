@@ -42,8 +42,6 @@ $ tree -d -L 1
 ├── frontend
 ├── migrations
 └── tmp
-
-12 directories
 ```
 
 ### The Server
@@ -69,6 +67,18 @@ For various purposes there are a bunch of [materialized views], which are views,
 The queries are not too slow, but even a few hundred milliseconds are already too slow for me. The materialized views help to keep that low enough for now.
 
 Last but not least these views keep some nasty SQL away from the app itself.
+
+### Frontend
+
+It's very simple setup here. Almost all views are static and compiled into the final binary of the server.
+
+The only dynamic view is the `/claim` endpoint, which sends a tiny HTML response with your IP and name included. That should make it usable outside of browsers, enabling you to verify everything worked without extra API calls.
+
+The JavaScript code is vanilla, no fancy library or framework used. The index page makes a few API calls to retrieve some JSON data and renders it into the right places.
+
+The only reason to leave it like that instead of over-engineering it is to provide a decent user experience. Any framework will ultimately add overhead/bloat which I don't want here.
+
+One day I might add a secondary main page where I test fancy stuff like Wasm based views (maybe with Yew or whatever is the latest and greatest for such task).
 
 -----
 
