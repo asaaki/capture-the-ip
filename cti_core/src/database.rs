@@ -8,7 +8,6 @@ use postgres_native_tls::MakeTlsConnector;
 use std::time::Duration;
 
 pub(crate) use cti_schema::*;
-pub(crate) mod manager;
 
 pub(crate) async fn setup_db() -> GenericResult<DbPool> {
     let database_url = if crate::utils::is_home() {
