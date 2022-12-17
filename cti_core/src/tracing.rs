@@ -2,12 +2,6 @@ use crate::types::AppResult;
 
 use tracing_subscriber::{filter::EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
 
-#[cfg(not(feature = "tracing"))]
-pub(crate) fn start_tracing() -> AppResult {
-    Ok(())
-}
-
-#[cfg(feature = "tracing")]
 pub(crate) fn start_tracing() -> AppResult {
     // let fmt_layer = tracing_subscriber::fmt::layer().compact();
     // let fmt_layer = tracing_subscriber::fmt::layer().without_time();

@@ -31,7 +31,7 @@ down:
 image: assets
 	docker build -t cti_server:build --target builder .
 	docker build -t cti_server:$(STAMP) .
-	docker rmi cti_server:latest
+	-docker rmi cti_server:latest
 	docker tag cti_server:$(STAMP) cti_server:latest
 	docker images cti_server
 
