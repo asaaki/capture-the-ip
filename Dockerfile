@@ -44,7 +44,9 @@ RUN git clone --depth 1 --branch ${MOLD_VER} https://github.com/rui314/mold.git;
     mkdir mold/build; \
     cd mold/build; \
     ../install-build-deps.sh; \
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=c++ ..; \
+    cmake \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DMOLD_LTO=ON ..; \
     cmake --build . -j $(nproc); \
     cmake --install .
 
@@ -74,9 +76,9 @@ COPY . .
 RUN \
   --mount=type=cache,target=/usr/local/cargo/registry \
   --mount=type=cache,target=/app/target \
-    # https://github.com/rust-lang/cargo/issues/7124#issuecomment-1200473377
-    cargo install --root . --git=file://$(pwd) \
-        cti_server cti_refresher cti_migrate
+    cargo build --release && \
+    mkdir -p /app/bin && \
+    cp /app/target/release/cti_* /app/bin/
 
 RUN /usr/bin/magicpak -v \
     --include /etc/passwd \
