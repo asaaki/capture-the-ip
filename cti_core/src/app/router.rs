@@ -1,4 +1,4 @@
-use super::{api::*, helpers::*};
+use super::{api::*, helpers::*, r#static::*};
 use crate::prelude::*;
 use axum::{
     routing::{any, get},
@@ -48,6 +48,6 @@ pub(crate) fn router(pool: DbPool) -> Router {
     };
 
     app_router
-        .fallback(crate::assets::static_handler)
+        .fallback(static_handler)
         .with_state(state)
 }

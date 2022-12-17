@@ -1,5 +1,5 @@
 [package]
-name = "cti_refresher"
+name = "cti_assets"
 description.workspace = true
 documentation.workspace = true
 edition.workspace = true
@@ -10,5 +10,7 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-cti_core = { path = "../cti_core" }
-rpmalloc = { version = "0.2.2", features = ["unlimited_cache", "global_cache", "thread_cache", "adaptive_thread_cache"] }
+rust-embed = { version = "6.4.2", features = [
+  # "compression", # https://github.com/pyrossh/rust-embed#compression
+  "interpolate-folder-path",
+] }

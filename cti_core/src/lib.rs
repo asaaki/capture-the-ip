@@ -4,7 +4,6 @@ use tokio_graceful_shutdown::Toplevel;
 use types::*;
 
 mod app;
-mod assets;
 mod bg;
 mod constants;
 mod database;

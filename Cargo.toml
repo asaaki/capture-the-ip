@@ -4,6 +4,7 @@ members = [
   "cti_types",
   "cti_env",
   "cti_schema",
+  "cti_assets",
   "cti_core",
   "cti_server",
   "cti_refresher",

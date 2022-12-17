@@ -25,12 +25,12 @@ There are crates for the binaries/executables and library crates for the busines
 
 `cti_server`, `cti_refresher`, and `cti_migrate` are the binaries. The first one is the most important, it's the "game" server itself. The refresher is currently not used separately, the server does this job itself as a background thread for now. The last one as the name indicates is to help with database migrations; since the project uses diesel as its database interface and ORM, its up to the administrating person to decide with tool to use, the cti_migrate can run on a remote server though without any Rust tooling present.
 
-The actual business logic for the server and refresher lives in `cti_core`, which itself also consumes some helper crates like `cti_constants`, `cti_types`, `cti_env`, `cti_schema`. The helper crates mostly came to exist as the migration tool's logic is a bit different, but still needed some common definitions and functions.
+The actual business logic for the server and refresher lives in `cti_core`, which itself also consumes some helper crates like `cti_constants`, `cti_types`, `cti_env`, `cti_schema`, and `cti_assets`. The helper crates mostly came to exist as the migration tool's logic is a bit different, but still needed some common definitions and functions.
 
 ```
 $ tree -d -L 1
 .
-├── assets
+├── cti_assets
 ├── cti_constants
 ├── cti_core
 ├── cti_env

@@ -5,13 +5,9 @@ use axum::{
     response::Response,
 };
 use hyper::StatusCode;
-use rust_embed::RustEmbed;
+use cti_assets::Assets;
 
 const INDEX_HTML: &str = "index.html";
-
-#[derive(RustEmbed)]
-#[folder = "$CARGO_MANIFEST_DIR/../assets"]
-struct Assets;
 
 // TODO: create and use an ETag header
 
