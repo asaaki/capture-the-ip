@@ -47,7 +47,5 @@ pub(crate) fn router(pool: DbPool) -> Router {
         app_router = app_router.nest("/debug", debug_routes);
     };
 
-    app_router
-        .fallback(static_handler)
-        .with_state(state)
+    app_router.fallback(static_handler).with_state(state)
 }

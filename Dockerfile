@@ -116,8 +116,6 @@ ENV PATH=/app/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 COPY --from=builder --chown=appuser:appuser /bundle /.
 COPY --from=builder /var/empty /var/empty
-COPY --from=builder /usr/share/ca-certificates /usr/share/ca-certificates
-COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 COPY --from=shell /shell /bin
 
 USER appuser:appuser

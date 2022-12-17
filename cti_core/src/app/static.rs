@@ -4,8 +4,8 @@ use axum::{
     http::{header, Uri},
     response::Response,
 };
-use hyper::StatusCode;
 use cti_assets::Assets;
+use hyper::StatusCode;
 
 const INDEX_HTML: &str = "index.html";
 

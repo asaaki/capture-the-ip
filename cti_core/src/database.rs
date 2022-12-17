@@ -3,11 +3,12 @@ use deadpool_diesel::{PoolConfig, Timeouts};
 use diesel::{ConnectionError, ConnectionResult};
 use diesel_async::RunQueryDsl;
 use futures::FutureExt;
-use native_tls::TlsConnector;
-use postgres_native_tls::MakeTlsConnector;
+use once_cell::sync::OnceCell;
 use std::time::Duration;
 
 pub(crate) use cti_schema::*;
+
+static TLS_CONFIG: OnceCell<rustls::ClientConfig> = OnceCell::new();
 
 pub(crate) async fn setup_db() -> GenericResult<DbPool> {
     let database_url = if crate::utils::is_home() {
@@ -26,11 +27,15 @@ pub(crate) async fn setup_db() -> GenericResult<DbPool> {
 
     let max_size = db_pool_size();
     let timeouts = Timeouts {
-        wait: Some(Duration::from_secs(3)),
-        create: Some(Duration::from_secs(3)),
-        recycle: Some(Duration::from_secs(3)),
+        wait: Some(Duration::from_secs(5)),
+        create: Some(Duration::from_secs(5)),
+        recycle: Some(Duration::from_secs(5)),
     };
     let config = PoolConfig { max_size, timeouts };
+
+    TLS_CONFIG
+        .set(tls_config())
+        .map_err(|_| eyre!("client config issue"))?;
 
     let manager = Manager::new_with_setup(database_url, |url| establish(url).boxed());
     let pool = DbPool::builder(manager)
@@ -57,10 +62,8 @@ fn db_default_port_for(db_scheme: &str) -> u16 {
 }
 
 async fn establish(database_url: &str) -> ConnectionResult<PgConn> {
-    let connector = TlsConnector::builder()
-        .build()
-        .map_err(|e| ConnectionError::BadConnection(e.to_string()))?;
-    let connector = MakeTlsConnector::new(connector);
+    let connector =
+        tokio_postgres_rustls::MakeRustlsConnect::new(TLS_CONFIG.get().unwrap().clone());
 
     let (client, connection) = tokio_postgres::connect(&database_url, connector)
         .await
@@ -71,4 +74,23 @@ async fn establish(database_url: &str) -> ConnectionResult<PgConn> {
         }
     });
     PgConn::try_from(client).await
+}
+
+fn tls_config() -> rustls::ClientConfig {
+    rustls::ClientConfig::builder()
+        .with_safe_defaults()
+        .with_root_certificates(root_store())
+        .with_no_client_auth()
+}
+
+fn root_store() -> rustls::RootCertStore {
+    let mut roots = rustls::RootCertStore::empty();
+    roots.add_server_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.0.iter().map(|ta| {
+        rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(
+            ta.subject,
+            ta.spki,
+            ta.name_constraints,
+        )
+    }));
+    roots
 }

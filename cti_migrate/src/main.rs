@@ -3,8 +3,7 @@ static ALLOC: rpmalloc::RpMalloc = rpmalloc::RpMalloc;
 
 use cti_env::*;
 use cti_types::*;
-use diesel::pg::PgConnection;
-use diesel::prelude::*;
+use diesel::{pg::PgConnection, prelude::*};
 use diesel_migrations::{
     embed_migrations, EmbeddedMigrations, HarnessWithOutput, MigrationHarness,
 };
