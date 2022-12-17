@@ -16,56 +16,7 @@ DOCKER_RUN_ARGS = \
 	-e FLY_REGION=$(FLY_REGION) \
 	-p 3000:3000
 
-NOW = $(shell bash -c 'date +%s')
 STAMP = $(shell bash -c 'date +%gW%V.%w%H%M') # 22W50.12345
-
-default:
-	@echo nope
-
-up:
-	docker compose up -d
-
-down:
-	docker compose down --remove-orphans
-
-image: assets
-	docker build -t cti_server:build --target builder .
-	docker build -t cti_server:$(STAMP) .
-	-docker rmi cti_server:latest
-	docker tag cti_server:$(STAMP) cti_server:latest
-	docker images cti_server
-
-publish: assets image
-	docker tag cti_server:latest registry.fly.io/cti:deployment-$(NOW)
-	docker push registry.fly.io/cti:deployment-$(NOW)
-
-deploy:
-	fly scale count 1
-	sleep 30
-	fly deploy
-	sleep 30
-	fly scale count 3
-
-run:
-	docker run $(DOCKER_RUN_ARGS) cti_server
-
-run.local:
-	cargo run -p cti_server
-
-shell:
-	docker run $(DOCKER_RUN_ARGS) cti_server sh
-
-shell.build:
-	docker run $(DOCKER_RUN_ARGS) cti_server:build bash
-
-app.stop:
-	docker compose stop app
-	docker compose kill app
-
-update: assets app.stop
-	docker compose up --build -d --no-deps app
-
-# frontend code
 
 ASSETS_DIR = cti_assets/assets
 FRONT_DIR = frontend
@@ -87,6 +38,33 @@ TIDY_SETTINGS = -q -utf8 \
 	--wrap 0 --vertical-space auto \
 	--drop-empty-elements no \
 	--tidy-mark no
+
+default:
+	@echo nope
+
+# fly.io
+
+deploy:
+	fly scale count 1
+	sleep 30
+	fly deploy
+	sleep 30
+	fly scale count 3
+
+# docker image
+
+image: assets
+	docker build -t cti_server:build --target builder .
+	docker build -t cti_server:$(STAMP) .
+	-docker rmi cti_server:latest
+	docker tag cti_server:$(STAMP) cti_server:latest
+	docker images cti_server
+
+publish: assets image
+	docker tag cti_server:latest registry.fly.io/cti:$(STAMP)
+	docker push registry.fly.io/cti:$(STAMP)
+
+# frontend code / asset pipeline
 
 # NEEDS:
 # tidy - https://binaries.html-tidy.org/
@@ -111,3 +89,32 @@ html.files: $(HTML_FILES)
 
 $(HTML_FILES): $(ASSETS_DIR)/%: $(FRONT_DIR)/%
 	tidy $(TIDY_SETTINGS) -o $@ $<
+
+# docker
+
+run:
+	docker run $(DOCKER_RUN_ARGS) cti_server
+
+run.local:
+	cargo run -p cti_server
+
+shell:
+	docker run $(DOCKER_RUN_ARGS) cti_server sh
+
+shell.build:
+	docker run $(DOCKER_RUN_ARGS) cti_server:build bash
+
+# docker compose
+
+up:
+	docker compose up -d
+
+down:
+	docker compose down --remove-orphans
+
+app.stop:
+	docker compose stop app
+	docker compose kill app
+
+update: assets app.stop
+	docker compose up --build -d --no-deps app
