@@ -62,7 +62,7 @@ app.stop:
 	docker compose stop app
 	docker compose kill app
 
-update: front app.stop
+update: assets app.stop
 	docker compose up --build -d --no-deps app
 
 # frontend code
