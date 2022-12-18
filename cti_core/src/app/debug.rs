@@ -1,5 +1,5 @@
 use super::helpers::*;
-use crate::{extractors::ClientIps, prelude::*};
+use crate::{extractors::ClientIpV4, prelude::*};
 use axum::extract::ConnectInfo;
 use axum::Json;
 use axum::{extract::State, http::StatusCode};
@@ -10,12 +10,12 @@ use tracing::instrument;
 #[instrument]
 pub(crate) async fn request_info(
     ConnectInfo(addr): ConnectInfo<SocketAddr>,
-    client_ips: ClientIps,
+    client_ip: ClientIpV4,
     req: axum::http::Request<axum::body::Body>,
 ) -> Result<String, (StatusCode, String)> {
     let mut output = String::from("Request Info\n\n");
     output.push_str(&format!("SocketAddr = {addr:?}\n\n"));
-    output.push_str(&format!("ClientIps = {client_ips:?}\n\n"));
+    output.push_str(&format!("ClientIpV4 = {client_ip:?}\n\n"));
     output.push_str("Request headers:\n");
     for (k, v) in req.headers() {
         output.push_str(&format!("{k} = {v:?}\n"));

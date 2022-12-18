@@ -1,5 +1,5 @@
 use super::helpers::*;
-use crate::{extractors::ClientIps, models, prelude::*};
+use crate::{extractors::ClientIpV4, models, prelude::*};
 use axum::{
     extract::{Query, State},
     http::StatusCode,
@@ -55,20 +55,21 @@ pub(crate) struct RankingResponse {
 
 #[instrument]
 pub(crate) async fn get_ip(
-    client_ips: ClientIps,
+    ClientIpV4 { ip }: ClientIpV4,
 ) -> Result<Json<GetIpResponse>, (StatusCode, String)> {
-    let v4 = !client_ips.ipv4.is_empty();
-    let ip = v4.then(|| client_ips.ipv4.get_index(0).unwrap()).copied();
-    Ok(Json(GetIpResponse { ip, v4 }))
+    Ok(Json(GetIpResponse {
+        ip,
+        v4: ip.is_some(),
+    }))
 }
 
 #[instrument]
 pub(crate) async fn claim_ip(
-    client_ips: ClientIps,
+    ClientIpV4 { ip }: ClientIpV4,
     claim_req: Query<ClaimRequest>,
     State(pool): QState,
 ) -> Result<Html<String>, (StatusCode, String)> {
-    if let Some(&ip) = client_ips.ipv4.get_index(0) {
+    if let Some(ip) = ip {
         let mut conn = pool.get().await.map_err(internal_error)?;
         let capture = Capture::create_from_ip_and_nick_now(&mut conn, ip, &claim_req.name)
             .await
