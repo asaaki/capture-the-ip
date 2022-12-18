@@ -4,6 +4,7 @@ app = "cti"
 
 kill_signal = "SIGINT"
 kill_timeout = 16 # a second longer than the app's graceful shutdown timer
+
 processes = []
 
 [build]
@@ -26,7 +27,6 @@ HOST_IP = "0.0.0.0"
 # we have only 3 instances (single process each)
 # during deployments this could go up to 6 in worst case, so still within limits
 DATABASE_POOL_SIZE = "100"
-
 
 [experimental]
 allowed_public_ports = []
