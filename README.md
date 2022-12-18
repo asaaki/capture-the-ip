@@ -109,7 +109,7 @@ dual licensed as above, without any additional terms or conditions.
 [rust]: https://www.rust-lang.org/
 [axum]: https://crates.io/crates/axum
 [tower]: https://crates.io/crates/tower
-[hyper]: https://crates.io/crates/hyper
+[hyper]: https://hyper.rs/
 [tokio]: https://crates.io/crates/tokio
 [diesel]: https://diesel.rs/
 [postgres]: https://www.postgresql.org/
