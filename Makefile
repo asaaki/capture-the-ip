@@ -109,6 +109,9 @@ shell.build:
 up:
 	docker compose up -d
 
+up.db:
+	docker compose up -d db
+
 down:
 	docker compose down --remove-orphans
 
