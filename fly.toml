@@ -50,7 +50,10 @@ port = 80
 force_https = true
 
 [[services.ports]]
-handlers = ["tls", "http"] # (instead of "http"): "proxy_proto" to pass through client IP info
+# (instead of "http"): "proxy_proto" to pass through client IP info,
+# but requires to speak the PROXY protocol:
+# https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt
+handlers = ["tls", "http"]
 port = 443
 tls_options = { "alpn" = ["h2", "http/1.1"], "versions" = ["TLSv1.2", "TLSv1.3"] }
 # tls_options = { "alpn" = ["h2"] }
