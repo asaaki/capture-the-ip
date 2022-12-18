@@ -153,6 +153,14 @@ code {
     word-wrap: break-word;
     font-size: 90%;
 }
+.s-nick a {
+    display: inline-block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 1ch;
+}
 .s-count {
     font-size: 70%;
 }

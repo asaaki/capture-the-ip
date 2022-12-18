@@ -18,27 +18,28 @@
             Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^
             Math.imul(h1 ^ (h1 >>> 13), 3266489909);
         return 4294967296 * (2097151 & h2) + (h1 >>> 0);
-    }
+    };
 
     const blockColor = (str) => {
         const hue = (((cyrb53(str) & 0xfff) / 0xfff) * 180) | 0;
         return `hsla(${hue}, 90%, 90%, 1)`;
-    }
+    };
 
-    const nameLink = (name)=> {
+    const nameLink = (name) => {
         const a = document.createElement('a');
         a.href = `/users.html?name=${encodeURIComponent(name)}`;
-        a.innerText = name;
+        a.title = name;
+        a.innerText = name; // truncate(name, 12);
         return a;
-    }
+    };
 
-    const intoJsonResponse = (response)=> {
+    const intoJsonResponse = (response) => {
         if (response.status === 200) {
             return response.json();
         } else {
             throw new Error("oops, couldn't load the data");
         }
-    }
+    };
 
     const ago = (dt, fix = 0) => {
         const formatter = new Intl.RelativeTimeFormat('en', {
@@ -67,7 +68,7 @@
             );
         }
         return 'over a year ago';
-    }
+    };
 
     const setLastUpdate = (last_updated_at) => {
         document.getElementById(
@@ -76,7 +77,7 @@
             Date.parse(last_updated_at + 'Z'),
             1
         )})`;
-    }
+    };
 
     const as_ord = (i) => {
         var j = i % 10,
@@ -91,7 +92,7 @@
             return i + 'rd';
         }
         return i + 'th';
-    }
+    };
 
     // homepage
 
@@ -108,7 +109,7 @@
                     // todo: note about non-ipv6
                 }
             });
-    }
+    };
 
     // tops
 
@@ -139,15 +140,15 @@
                 const list = document.querySelector('ol');
                 rankings.forEach(({ nick, blocks, total_claims }, idx) => {
                     const li = document.createElement('li');
+                    const b_bl = document.createElement('b');
+                    b_bl.innerText = blocks.length;
                     li.appendChild(nameLink(nick));
                     li.append(
                         ` with ${total_claims} address${
                             total_claims == 1 ? '' : 'es'
-                        }, and ${blocks.length} block${
-                            blocks.length > 1 ? 's' : ''
-                        } controlled: `
+                        }, and `,
+                        b_bl, ` block${blocks.length > 1 ? 's' : ''} controlled: `
                     );
-                    // li.appendChild(document.createElement('br'));
                     li.append(blocks.join(', '));
                     list.appendChild(li);
                 });
@@ -167,7 +168,7 @@
                     showAllTopsButton.style.display = 'none';
                 }
             });
-    }
+    };
 
     // recent
 
@@ -182,8 +183,14 @@
 
                 claims.forEach(({ nick, ip, claimed_at }, idx) => {
                     const div = document.createElement('div');
+                    const bip = document.createElement('b');
+
                     div.classList.add('recent-claim');
-                    div.append(`${ip} got captured ${ago(claimed_at * 1000)} by `);
+                    bip.innerText = ip;
+
+                    div.append(bip,
+                        ` got captured ${ago(claimed_at * 1000)} by `
+                    );
                     div.appendChild(nameLink(nick));
                     if (idx >= 10) {
                         div.style.display = 'none';
@@ -198,7 +205,7 @@
                         .forEach((e) => (e.style.display = ''));
                 };
             });
-    }
+    };
 
     // block holders
 
@@ -231,7 +238,7 @@
                     }
                 }
             });
-    }
+    };
 
     // user page
 
@@ -254,14 +261,16 @@
 
                 for (const e of rankings) {
                     const li = document.createElement('li');
-                    const line = `${e.is_tied?'Tied ':''}${as_ord(e.rank)} in block ${e.block}.0.0.0/8 with ${
-                        e.claims
-                    } address${e.claims == 1 ? '' : 'es'}`;
+                    const line = `${e.is_tied ? 'Tied ' : ''}${as_ord(
+                        e.rank
+                    )} in block ${e.block}.0.0.0/8 with ${e.claims} address${
+                        e.claims == 1 ? '' : 'es'
+                    }`;
                     li.innerHTML = line;
                     list.appendChild(li);
                 }
             });
-    }
+    };
 
     const path = location.pathname;
     if (path === '/' || path === '/index.html') {
