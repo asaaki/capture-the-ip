@@ -24,7 +24,7 @@ pub(crate) async fn request_info(
 }
 
 // Note: use this carefully,
-// #[instrument] // not working: AsyncPgConnection has no Debug impl
+#[instrument]
 pub(crate) async fn seed_handler(State(pool): QState) -> Result<Json<bool>, (StatusCode, String)> {
     let items: Vec<NewCapture<'_>> = (0..100)
         .map(|_| {

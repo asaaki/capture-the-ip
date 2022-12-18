@@ -62,7 +62,7 @@ pub(crate) async fn get_ip(
     Ok(Json(GetIpResponse { ip, v4 }))
 }
 
-// #[instrument] // not working: AsyncPgConnection has no Debug impl
+#[instrument]
 pub(crate) async fn claim_ip(
     client_ips: ClientIps,
     claim_req: Query<ClaimRequest>,
@@ -92,7 +92,7 @@ pub(crate) async fn claim_ip(
     }
 }
 
-// #[instrument] // not working: AsyncPgConnection has no Debug impl
+#[instrument]
 pub(crate) async fn get_recent_claims(
     State(pool): QState,
 ) -> Result<Json<RecentClaimsResponse>, (StatusCode, String)> {
@@ -110,7 +110,7 @@ pub(crate) async fn get_recent_claims(
     Ok(Json(response))
 }
 
-// #[instrument] // not working: AsyncPgConnection has no Debug impl
+#[instrument]
 pub(crate) async fn user_ranking(
     claim_req: Query<ClaimRequest>,
     State(pool): QState,
@@ -140,7 +140,7 @@ pub(crate) async fn user_ranking(
     Ok(Json(response))
 }
 
-// #[instrument] // not working: AsyncPgConnection has no Debug impl
+#[instrument]
 pub(crate) async fn get_block_holders(
     State(pool): QState,
 ) -> Result<Json<BlockHoldersResponse>, (StatusCode, String)> {
@@ -173,9 +173,9 @@ pub(crate) async fn get_block_holders(
 //       we can probably replace that with a single macro.
 macro_rules! ranking_handler_for {
     ($schema:ident) => {
-        // #[instrument] // not working: AsyncPgConnection has no Debug impl
         // rustc's concat_idents! is not stable yet
         concat_idents::concat_idents!(fn_name = get_, $schema {
+        #[instrument]
         pub(crate) async fn fn_name (
             State(pool): QState,
         ) -> Result<Json<RankingResponse>, (StatusCode, String)> {

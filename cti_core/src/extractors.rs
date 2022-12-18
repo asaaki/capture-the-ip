@@ -5,6 +5,7 @@ use axum::{
 };
 use forwarded_header_value::{ForwardedHeaderValue, Identifier};
 use indexmap::IndexSet;
+use tracing::instrument;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::{marker::Sync, net::SocketAddr};
 
@@ -24,10 +25,11 @@ pub(crate) struct ClientIps {
 #[async_trait]
 impl<S> FromRequestParts<S> for ClientIps
 where
-    S: Sync,
+    S: Sync + std::fmt::Debug,
 {
     type Rejection = (StatusCode, &'static str);
 
+    #[instrument]
     async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
         let mut ips = V4AndV6::default();
         get_fly_client_ip(&parts.headers, &mut ips);

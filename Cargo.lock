@@ -590,7 +590,7 @@ dependencies = [
 [[package]]
 name = "diesel-async"
 version = "0.2.0"
-source = "git+https://github.com/weiznich/diesel_async#fc27118901f107af539b9edebba0dd00e0dab545"
+source = "git+https://github.com/asaaki/diesel_async?branch=add-debugs#c86f7333b440906d10552a239ba48089518c0287"
 dependencies = [
  "async-trait",
  "deadpool",
