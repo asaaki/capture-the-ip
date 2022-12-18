@@ -50,9 +50,10 @@ port = 80
 force_https = true
 
 [[services.ports]]
-handlers = ["tls"]
+handlers = ["tls", "http"] # (instead of "http"): "proxy_proto" to pass through client IP info
 port = 443
-tls_options = { "alpn" = ["h2"] }
+tls_options = { "alpn" = ["h2"], "versions" = ["TLSv1.2", "TLSv1.3"] }
+# tls_options = { "alpn" = ["h2"] }
 
 [[services.tcp_checks]]
 interval = "15s"
