@@ -37,7 +37,7 @@ diesel_logger = "0.2.0"
 fakedata_generator = "0.2.4"
 forwarded-header-value = "0.1.1"
 futures = "0.3.25"
-hyper = { version = "0.14.23", features = ["full"] }
+hyper = { version = "0.14.23", features = ["http1", "http2", "runtime", "server", "stream", "tcp"] }
 indexmap = { version = "1.9.2", features = ["std"] }
 indoc = "1.0.7"
 log = "0.4.17"
