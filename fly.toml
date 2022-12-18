@@ -50,8 +50,9 @@ port = 80
 force_https = true
 
 [[services.ports]]
-handlers = ["tls", "http"]
+handlers = ["tls"]
 port = 443
+tls_options = { "alpn" = ["h2"] }
 
 [[services.tcp_checks]]
 interval = "15s"

@@ -38,6 +38,7 @@ impl HttpServerSubSystem {
         log::info!("Listening on {addr} ({hostname}) ...");
         axum::Server::bind(&addr)
             .http1_header_read_timeout(Duration::from_secs(5))
+            .http1_half_close(true)
             .http2_enable_connect_protocol()
             .serve(app.into_make_service_with_connect_info::<SocketAddr>())
             .with_graceful_shutdown(subsys.on_shutdown_requested())
