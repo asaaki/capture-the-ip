@@ -45,7 +45,7 @@ results as (
     group by nick
 )
 select * from results
-order by array_length(blocks, 2) desc, total_claims desc;
+order by array_length(blocks, 1) desc, total_claims desc;
 
 -- TOP YEAR
 
@@ -82,7 +82,7 @@ results as (
     group by nick
 )
 select * from results
-order by array_length(blocks, 2) desc, total_claims desc;
+order by array_length(blocks, 1) desc, total_claims desc;
 
 -- TOP MONTH
 
@@ -119,7 +119,7 @@ results as (
     group by nick
 )
 select * from results
-order by array_length(blocks, 2) desc, total_claims desc;
+order by array_length(blocks, 1) desc, total_claims desc;
 
 -- TOP WEEK
 
@@ -156,7 +156,7 @@ results as (
     group by nick
 )
 select * from results
-order by array_length(blocks, 2) desc, total_claims desc;
+order by array_length(blocks, 1) desc, total_claims desc;
 
 -- TOP DAY
 
@@ -193,7 +193,7 @@ results as (
     group by nick
 )
 select * from results
-order by array_length(blocks, 2) desc, total_claims desc;
+order by array_length(blocks, 1) desc, total_claims desc;
 
 -- TOP HOUR
 
@@ -230,4 +230,4 @@ results as (
     group by nick
 )
 select * from results
-order by array_length(blocks, 2) desc, total_claims desc;
+order by array_length(blocks, 1) desc, total_claims desc;
