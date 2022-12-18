@@ -4,11 +4,12 @@ use diesel::{ConnectionError, ConnectionResult};
 use diesel_async::RunQueryDsl;
 use futures::FutureExt;
 use once_cell::sync::OnceCell;
+use rustls::{RootCertStore, ClientConfig};
 use std::time::Duration;
 
 pub(crate) use cti_schema::*;
 
-static TLS_CONFIG: OnceCell<rustls::ClientConfig> = OnceCell::new();
+static TLS_CONFIG: OnceCell<ClientConfig> = OnceCell::new();
 
 pub(crate) async fn setup_db() -> GenericResult<DbPool> {
     let database_url = if crate::utils::is_home() {
@@ -68,6 +69,7 @@ async fn establish(database_url: &str) -> ConnectionResult<PgConn> {
     let (client, connection) = tokio_postgres::connect(&database_url, connector)
         .await
         .map_err(|e| ConnectionError::BadConnection(e.to_string()))?;
+
     tokio::spawn(async move {
         if let Err(e) = connection.await {
             log::error!("connection error: {e}");
@@ -76,15 +78,15 @@ async fn establish(database_url: &str) -> ConnectionResult<PgConn> {
     PgConn::try_from(client).await
 }
 
-fn tls_config() -> rustls::ClientConfig {
-    rustls::ClientConfig::builder()
+fn tls_config() -> ClientConfig {
+    ClientConfig::builder()
         .with_safe_defaults()
         .with_root_certificates(root_store())
         .with_no_client_auth()
 }
 
-fn root_store() -> rustls::RootCertStore {
-    let mut roots = rustls::RootCertStore::empty();
+fn root_store() -> RootCertStore {
+    let mut roots = RootCertStore::empty();
     roots.add_server_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.0.iter().map(|ta| {
         rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(
             ta.subject,
