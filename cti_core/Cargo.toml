@@ -28,7 +28,6 @@ deadpool-diesel = { version = "0.4.1", features = [] }
 deadpool-sync = "0.1.0"
 diesel = { version = "2.0.2", features = ["chrono"] }
 diesel-async = { version = "0.2.0", git = "https://github.com/asaaki/diesel_async", branch = "add-debugs", features = ["deadpool", "postgres"] }
-diesel_logger = "0.2.0"
 fakedata_generator = "0.2.4"
 forwarded-header-value = "0.1.1"
 futures = "0.3.25"
