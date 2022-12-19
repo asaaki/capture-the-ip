@@ -30,7 +30,7 @@ impl HttpServerSubSystem {
         let app = app::router(self.pool)
             .layer(CompressionLayer::new())
             .layer(DefaultHeadersLayer::new(default_headers))
-            .layer(TimeoutLayer::new(Duration::from_secs(5)))
+            .layer(TimeoutLayer::new(Duration::from_secs(30)))
             .layer(trace_layer);
         let addr = addr();
         let hostname = hostname();
