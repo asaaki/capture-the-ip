@@ -41,8 +41,8 @@ script_checks = []
 
 [services.concurrency]
 type = "connections"
-hard_limit = 150
-soft_limit = 100
+hard_limit = 250
+soft_limit = 200
 
 [[services.ports]]
 handlers = ["http"]
@@ -52,7 +52,7 @@ force_https = true
 [[services.ports]]
 # (instead of "http"): "proxy_proto" to pass through client IP info,
 # but requires to speak the PROXY protocol:
-# https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt
+# https://www.haproxy.org/download/2.8/doc/proxy-protocol.txt
 handlers = ["tls", "http"]
 port = 443
 tls_options = { "alpn" = ["h2", "http/1.1"], "versions" = ["TLSv1.2", "TLSv1.3"] }
