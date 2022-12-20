@@ -44,5 +44,11 @@ pub(crate) fn router(pool: DbPool) -> Router {
         app_router = app_router.nest("/debug", debug_routes);
     };
 
-    app_router.fallback(static_handler).with_state(state)
+    // Note: we need to use a dedicated router as a fallback service,
+    // so the layer service gets only applied here, not to all routes!
+    let static_router = Router::new()
+        .fallback(static_handler)
+        .layer(tower_helmet::HelmetLayer::with_defaults());
+
+    app_router.fallback_service(static_router).with_state(state)
 }

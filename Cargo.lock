@@ -393,6 +393,7 @@ dependencies = [
  "tokio-postgres-rustls",
  "tower",
  "tower-default-headers",
+ "tower-helmet",
  "tower-http",
  "tracing",
  "tracing-subscriber",
@@ -2298,6 +2299,20 @@ dependencies = [
  "futures-util",
  "http",
  "pin-project",
+ "tower-layer",
+ "tower-service",
+]
+
+[[package]]
+name = "tower-helmet"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a0563e4d50c56d15f5e620fddb0fdb42c1349f466104efc74542c13b97a9651"
+dependencies = [
+ "futures",
+ "http",
+ "lazy_static",
+ "pin-project-lite",
  "tower-layer",
  "tower-service",
 ]
