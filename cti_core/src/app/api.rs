@@ -63,7 +63,7 @@ pub(crate) async fn get_ip(
     }))
 }
 
-#[instrument]
+#[instrument(skip(pool))]
 pub(crate) async fn claim_ip(
     ClientIpV4 { ip }: ClientIpV4,
     claim_req: Query<ClaimRequest>,
@@ -93,7 +93,7 @@ pub(crate) async fn claim_ip(
     }
 }
 
-#[instrument]
+#[instrument(skip(pool))]
 pub(crate) async fn get_recent_claims(
     State(pool): QState,
 ) -> Result<Json<RecentClaimsResponse>, (StatusCode, String)> {
@@ -111,7 +111,7 @@ pub(crate) async fn get_recent_claims(
     Ok(Json(response))
 }
 
-#[instrument]
+#[instrument(skip(pool))]
 pub(crate) async fn user_ranking(
     claim_req: Query<ClaimRequest>,
     State(pool): QState,
@@ -141,7 +141,7 @@ pub(crate) async fn user_ranking(
     Ok(Json(response))
 }
 
-#[instrument]
+#[instrument(skip(pool))]
 pub(crate) async fn get_block_holders(
     State(pool): QState,
 ) -> Result<Json<BlockHoldersResponse>, (StatusCode, String)> {
@@ -176,7 +176,7 @@ macro_rules! ranking_handler_for {
     ($schema:ident) => {
         // rustc's concat_idents! is not stable yet
         concat_idents::concat_idents!(fn_name = get_, $schema {
-        #[instrument]
+        #[instrument(skip(pool))]
         pub(crate) async fn fn_name (
             State(pool): QState,
         ) -> Result<Json<RankingResponse>, (StatusCode, String)> {

@@ -20,8 +20,7 @@ pub(crate) fn router(pool: DbPool) -> Router {
         .route("/day", get(get_ranking_day))
         .route("/hour", get(get_ranking_hour))
         // default root if no period is selected
-        .route("/", get(get_ranking_week))
-        .with_state(state.clone());
+        .route("/", get(get_ranking_week));
 
     let api_routes = Router::new()
         .nest("/users", users_routes)
@@ -29,8 +28,7 @@ pub(crate) fn router(pool: DbPool) -> Router {
         .route("/blocks", get(get_block_holders))
         .route("/recent", get(get_recent_claims))
         .route("/ip", get(get_ip))
-        .fallback(handler_404)
-        .with_state(state.clone());
+        .fallback(handler_404);
 
     #[allow(unused_mut)]
     let mut app_router = Router::new()
@@ -41,8 +39,7 @@ pub(crate) fn router(pool: DbPool) -> Router {
     {
         let debug_routes = Router::new()
             .route("/info", get(request_info))
-            .route("/seed", get(seed_handler))
-            .with_state(state.clone());
+            .route("/seed", get(seed_handler));
 
         app_router = app_router.nest("/debug", debug_routes);
     };

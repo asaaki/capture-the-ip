@@ -20,11 +20,11 @@ pub(crate) struct ClientIpV4 {
 #[async_trait]
 impl<S> FromRequestParts<S> for ClientIpV4
 where
-    S: Sync + std::fmt::Debug,
+    S: Sync,
 {
     type Rejection = (StatusCode, &'static str);
 
-    #[instrument]
+    #[instrument(skip(_state))]
     async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
         let ip = get_fly_client_ip(&parts.headers)
             .or_else(|| get_x_forwarded_for(&parts.headers))

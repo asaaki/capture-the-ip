@@ -1,3 +1,6 @@
+// TODO! Eventually remove me!
+#![allow(dead_code)]
+
 use axum::{
     async_trait,
     extract::{ConnectInfo, FromRequestParts},
@@ -7,7 +10,6 @@ use forwarded_header_value::{ForwardedHeaderValue, Identifier};
 use indexmap::IndexSet;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::{marker::Sync, net::SocketAddr};
-use tracing::instrument;
 
 type V4AndV6 = (IndexSet<Ipv4Addr>, IndexSet<Ipv6Addr>);
 
@@ -15,7 +17,6 @@ const X_REAL_IP: &str = "x-real-ip";
 const X_FORWARDED_FOR: &str = "x-forwarded-for";
 const FLY_CLIENT_IP: &str = "fly-client-ip";
 
-#[allow(dead_code)] // TODO: maybe remove this extractor
 #[derive(Debug)]
 pub(crate) struct ClientIps {
     pub(crate) ipv4: IndexSet<Ipv4Addr>,
@@ -29,7 +30,6 @@ where
 {
     type Rejection = (StatusCode, &'static str);
 
-    #[instrument]
     async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
         let mut ips = V4AndV6::default();
         get_fly_client_ip(&parts.headers, &mut ips);

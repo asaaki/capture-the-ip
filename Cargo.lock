@@ -588,12 +588,13 @@ dependencies = [
 [[package]]
 name = "diesel-async"
 version = "0.2.0"
-source = "git+https://github.com/asaaki/diesel_async?branch=add-debugs#7e52fd8a8268baeb5067331bbb80d830f40ecf73"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5f9ff806825ea92f061cfca008f4885149a6c62b7f508d00d2c35c3d7522b946"
 dependencies = [
  "async-trait",
  "deadpool",
  "diesel",
- "futures-util",
+ "futures",
  "scoped-futures",
  "tokio",
  "tokio-postgres",
