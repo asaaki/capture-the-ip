@@ -10,5 +10,4 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-cti_core = { path = "../cti_core" }
-rpmalloc = { version = "0.2.2", features = ["unlimited_cache", "global_cache", "thread_cache", "adaptive_thread_cache"] }
+cti_core_runner = { path = "../cti_core_runner" }

@@ -6,6 +6,7 @@ members = [
   "cti_schema",
   "cti_assets",
   "cti_core",
+  "cti_core_runner",
   "cti_server",
   "cti_refresher",
   "cti_migrate",
@@ -28,11 +29,7 @@ lto = true
 codegen-units = 1
 incremental = true
 strip = true
-
-# # https://doc.rust-lang.org/cargo/reference/profiles.html#custom-profiles
-# [profile.release-strip]
-# inherits = "release"
-# strip = true
+rpath = true
 
 [profile.dev.package."*"]
 opt-level = 3

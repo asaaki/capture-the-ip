@@ -1,0 +1,5 @@
+fn main() {
+    println!("cargo:rustc-link-lib=dylib=cti_core");
+    println!("cargo:rustc-link-search=all=/app/bin");
+    println!("cargo:rustc-link-arg=-Wl,-rpath=/app/bin");
+}

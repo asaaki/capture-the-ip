@@ -403,6 +403,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "cti_core_runner"
+version = "0.1.0"
+dependencies = [
+ "cti_types",
+ "rpmalloc",
+]
+
+[[package]]
 name = "cti_env"
 version = "0.1.0"
 dependencies = [
@@ -425,8 +433,7 @@ dependencies = [
 name = "cti_refresher"
 version = "0.1.0"
 dependencies = [
- "cti_core",
- "rpmalloc",
+ "cti_core_runner",
 ]
 
 [[package]]
@@ -440,8 +447,7 @@ dependencies = [
 name = "cti_server"
 version = "0.1.0"
 dependencies = [
- "cti_core",
- "rpmalloc",
+ "cti_core_runner",
 ]
 
 [[package]]

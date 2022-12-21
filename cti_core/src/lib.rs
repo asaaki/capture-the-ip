@@ -18,13 +18,29 @@ mod tracing;
 mod types;
 mod utils;
 
-pub mod app_prelude {
-    pub use super::run_app;
-    pub use super::types::{AppResult, RunMode};
-    pub use tokio;
+#[allow(unsafe_code)]
+// SAFETY: we control both ends; also no_mangle is considered unsafe(?)
+#[no_mangle]
+pub extern "C" fn run(mode: RunMode) -> u8 {
+    match run_async(mode) {
+        Ok(()) => 0,
+        Err(e) => {
+            eprintln!("CORE ERR: {e}");
+            1
+        }
+    }
 }
 
-pub async fn run_app(mode: RunMode) -> AppResult {
+fn run_async(mode: RunMode) -> AppResult {
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .expect("tokio runtime build issue")
+        .block_on(run_app(mode))?;
+    Ok(())
+}
+
+async fn run_app(mode: RunMode) -> AppResult {
     utils::setup()?;
 
     #[cfg(debug_assertions)]

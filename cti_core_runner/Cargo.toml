@@ -1,5 +1,5 @@
 [package]
-name = "cti_server"
+name = "cti_core_runner"
 description.workspace = true
 documentation.workspace = true
 edition.workspace = true
@@ -10,4 +10,5 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-cti_core_runner = { path = "../cti_core_runner" }
+cti_types = { path = "../cti_types" }
+rpmalloc = { version = "0.2.2", features = ["unlimited_cache", "global_cache", "thread_cache", "adaptive_thread_cache"] }

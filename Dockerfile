@@ -76,19 +76,26 @@ COPY . .
 RUN \
   --mount=type=cache,target=/usr/local/cargo/registry \
   --mount=type=cache,target=/app/target \
-    cargo build --release && \
+    cargo build --release -p cti_core && \
+    cargo build --release --bins && \
     mkdir -p /app/bin && \
+    cp /app/target/release/libcti_core.so /app/bin/ ; \
+    cp /app/target/release/libcti_core.so /lib/ ; \
     cp /app/target/release/cti_* /app/bin/
 
-RUN /usr/bin/magicpak -v \
+# Note: Remove compression if you want to inspect linked shared libs;
+# due to upx this gets hidden (the wrapper bin is static).
+# Inn production image you can then run:
+# /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 --list /app/bin/cti_server
+RUN magicpak -v \
     --include /etc/passwd \
     --include /etc/group \
     --compress --upx-arg --best --upx-arg --lzma \
     /app/bin/cti_server /bundle.server
-RUN /usr/bin/magicpak -v \
+RUN magicpak -v \
     --compress --upx-arg --best --upx-arg --lzma \
     /app/bin/cti_refresher /bundle.refresher
-RUN /usr/bin/magicpak -v \
+RUN magicpak -v \
     --compress --upx-arg --best --upx-arg --lzma \
     /app/bin/cti_migrate /bundle.migrate
 RUN mkdir -p /bundle && \
