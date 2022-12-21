@@ -27,6 +27,8 @@ There are crates for the binaries/executables and library crates for the busines
 
 The actual business logic for the server and refresher lives in `cti_core`, which itself also consumes some helper crates like `cti_constants`, `cti_types`, `cti_env`, `cti_schema`, and `cti_assets`. The helper crates mostly came to exist as the migration tool's logic is a bit different, but still needed some common definitions and functions.
 
+Just because I can, `cti_core` is compiled as a _shared library_ (a `.dll` in Windows, a `.so` in Linux, and theoretically a `.dylib` in Macos, but the last one is not an a platform I target) and then loaded by cti_server and cti_refresher, the migration tool uses slightly different logic and does not depend on cti_core at all. Interestingly the cti_core as a standalone library is much bigger than a binary which statically depends on it instead. I assume Rust can make some good optimizations when munching together some rlibs. Since this is still an exercise of over-engineering I take the size overhead for the added complexity … is that a loose-loose situation?
+
 ```
 $ tree -d -L 1
 .
