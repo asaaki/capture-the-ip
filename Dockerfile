@@ -85,7 +85,7 @@ RUN \
 
 # Note: Remove compression if you want to inspect linked shared libs;
 # due to upx this gets hidden (the wrapper bin is static).
-# Inn production image you can then run:
+# In production image you can then run:
 # /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 --list /app/bin/cti_server
 RUN magicpak -v \
     --include /etc/passwd \
