@@ -6,6 +6,9 @@ The objective is to send requests to the site **[ipv4.quest]** from as many diff
 
 If you claim and hold the majority of an `#.0.0.0/8` address block, you get a point.
 
+Read more about it here:  \
+<https://markentier.tech/posts/2022/12/capture-the-ip/>
+
 ## Technology
 
 - language: [rust](https://www.rust-lang.org/)
