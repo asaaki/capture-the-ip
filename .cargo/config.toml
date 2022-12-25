@@ -6,6 +6,8 @@ t = "test"
 r = "run"
 rr = "run --release"
 
+assets = "build --package cti_assets --release"
+ad = "build --package cti_assets"
 core = "build --package cti_core --release"
 cd = "build --package cti_core"
 s = "run --package cti_server --release"
