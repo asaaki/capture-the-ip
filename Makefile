@@ -64,6 +64,18 @@ publish: assets image
 	docker tag cti_server:latest registry.fly.io/cti:$(STAMP)
 	docker push registry.fly.io/cti:$(STAMP)
 
+# local
+
+debug: assets
+	cargo adev
+	cargo cdev
+	cargo serve
+
+release: assets
+	cargo assets
+	cargo core
+	cargo sr
+
 # frontend code / asset pipeline
 
 # NEEDS:

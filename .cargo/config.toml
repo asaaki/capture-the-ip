@@ -7,11 +7,16 @@ r = "run"
 rr = "run --release"
 
 assets = "build --package cti_assets --release"
-ad = "build --package cti_assets"
+assets-debug = "build --package cti_assets"
+adev = "build --package cti_assets"
+
 core = "build --package cti_core --release"
-cd = "build --package cti_core"
-s = "run --package cti_server --release"
-sd = "run --package cti_server"
+core-debug = "build --package cti_core --release"
+cdev = "build --package cti_core"
+
+sr = "run --package cti_server --release"
+serve = "run --package cti_server"
+sdev = "run --package cti_server"
 
 [env]
 HELLO = { value = "world" }
