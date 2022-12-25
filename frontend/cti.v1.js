@@ -113,12 +113,12 @@
 
     // tops
 
-    window.updateTops = (period) => {
+    document.getElementById('rank-period').addEventListener('change', (ev) => {
         const url = new URL(location.href);
-        url.hash = period;
+        url.hash = ev.target.value;
         location.replace(url);
         location.reload();
-    };
+    });
 
     const fetchTops = () => {
         const timeWindow = document.getElementById('rank-period');
