@@ -4,6 +4,7 @@
 /logs
 /node_modules
 
+.git
 .gitignore
 docker-compose.yaml
 Dockerfile

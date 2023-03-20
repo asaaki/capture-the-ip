@@ -48,6 +48,10 @@ h2 {
     font-size: 1.5rem;
 }
 
+h1 code {
+    color: #742;
+}
+
 form {
     display: block;
 }
@@ -98,7 +102,7 @@ code {
     margin-bottom: 5rem;
 }
 
-.segment {
+.s {
     width: 11%;
     min-width: 13ch;
     min-height: 6rem;
@@ -114,19 +118,19 @@ code {
     transform: matrix(1, -0.025, 0, 1, 0, 0);
     opacity: 0.8;
 }
-.segment:not(.segment-empty):hover {
+.s:not(.s-empty):hover {
     transform: matrix(1, 0, 0, 1, 0, 0) scale(1.5);
     opacity: 1;
     z-index: 999;
 }
 
-.segment-empty {
+.s-empty {
     pointer-events: none;
     user-select: none;
     background-color: #0050701a;
     opacity: 0.5;
 }
-.segment-tied {
+.s-tied {
     background-color: #0050701a;
     background: repeating-linear-gradient(
         135deg,
@@ -137,19 +141,27 @@ code {
     );
 }
 
-.segment > * {
+.s > * {
     display: block;
 }
 
-.segment-cidr {
+.s-cidr {
     width: 100%;
     text-align: right;
 }
-.segment-nick {
+.s-nick {
     word-wrap: break-word;
     font-size: 90%;
 }
-.segment-count {
+.s-nick a {
+    display: inline-block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 1ch;
+}
+.s-count {
     font-size: 70%;
 }
 

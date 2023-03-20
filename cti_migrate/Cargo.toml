@@ -13,6 +13,6 @@ version.workspace = true
 cti_types = { path = "../cti_types"}
 cti_env = { path = "../cti_env"}
 
-diesel = { version = "2.0.2", features = ["postgres"] }
+diesel = { version = "2.0.3", features = ["postgres"] }
 diesel_migrations = { version = "2.0.0", features = ["postgres"] }
 rpmalloc = { version = "0.2.2", features = ["unlimited_cache", "global_cache", "thread_cache", "adaptive_thread_cache"] }

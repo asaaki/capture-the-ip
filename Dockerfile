@@ -1,30 +1,24 @@
 # syntax=docker/dockerfile:1-labs
 
-ARG USER_NAME=appuser
-ARG USER_ID=10001
-
-ARG RUST_IMG_VER=1.65.0-bullseye
-ARG BUSYBOX_IMG_VER=1.35.0-glibc
-ARG DISTROLESS_IMG_VER=cc-debian11
-
-ARG MOLD_VER=v1.7.1
+ARG RUST_IMG_VER=1.68.0-bookworm
+ARG BUSYBOX_IMG_VER=1.36.0-glibc
+# note: do not use :nonroot tag, as it does not work with fly.io
+ARG DISTROLESS_IMG_VER=cc
 
 ARG MAGICPAK_VER=1.3.2
 ARG MAGICPAK_ARCH=x86_64
 
-ARG UPX_VER=4.0.1
+ARG UPX_VER=4.0.2
 ARG UPX_ARCH=amd64
 
 FROM rust:${RUST_IMG_VER} as builder
 
-ARG MOLD_VER
 ARG MAGICPAK_VER
 ARG MAGICPAK_ARCH
 ARG UPX_VER
 ARG UPX_ARCH
 
-ARG USER_NAME
-ARG USER_ID
+ENV DEBIAN_FRONTEND noninteractive
 
 # https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md#example-cache-apt-packages
 RUN rm -f /etc/apt/apt.conf.d/docker-clean; \
@@ -35,28 +29,14 @@ RUN \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
     /bin/sh -c set -ex; \
     apt-get update && apt-get upgrade; \
-    apt-get install -y clang cmake pkg-config libssl-dev ca-certificates
+    apt-get install -y ca-certificates clang cmake libssl-dev mold pkg-config
 
 RUN update-ca-certificates --fresh
-
-# Note: if Rust's debian release gets updated to bookworm, we can apt install it
-RUN git clone --depth 1 --branch ${MOLD_VER} https://github.com/rui314/mold.git; \
-    mkdir mold/build; \
-    cd mold/build; \
-    ../install-build-deps.sh; \
-    cmake \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DMOLD_LTO=ON ..; \
-    cmake --build . -j $(nproc); \
-    cmake --install .
 
 ADD https://github.com/coord-e/magicpak/releases/download/v${MAGICPAK_VER}/magicpak-${MAGICPAK_ARCH}-unknown-linux-musl /usr/bin/magicpak
 RUN chmod +x /usr/bin/magicpak
 RUN wget -O upx.tar.xz https://github.com/upx/upx/releases/download/v${UPX_VER}/upx-${UPX_VER}-${UPX_ARCH}_linux.tar.xz && \
     tar -xf upx.tar.xz --directory /usr/bin --strip-components=1 $(tar -tf upx.tar.xz | grep -E 'upx$')
-
-ENV USER=${USER_NAME} \
-    UID=${USER_ID}
 
 RUN adduser \
     --disabled-password \
@@ -64,8 +44,8 @@ RUN adduser \
     --home "/nonexistent" \
     --shell "/sbin/nologin" \
     --no-create-home \
-    --uid "${UID}" \
-    "${USER}"
+    --uid 1001 \
+    appuser
 
 RUN mkdir -p /var/empty
 
@@ -121,10 +101,10 @@ FROM gcr.io/distroless/${DISTROLESS_IMG_VER} as production
 
 ENV PATH=/app/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-COPY --from=builder --chown=appuser:appuser /bundle /.
+COPY --from=builder --chown=1001:1001 /bundle /.
 COPY --from=builder /var/empty /var/empty
 COPY --from=shell /shell /bin
 
-USER appuser:appuser
+USER 1001:1001
 
 CMD ["/app/bin/cti_server"]
