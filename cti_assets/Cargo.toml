@@ -10,7 +10,7 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-rust-embed = { version = "6.6.0", features = [
+rust-embed = { version = "6.8.1", features = [
   # "compression", # https://github.com/pyrossh/rust-embed#compression
   "interpolate-folder-path",
 ] }

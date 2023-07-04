@@ -1,65 +1,50 @@
-# https://fly.io/docs/reference/configuration/
+# fly.toml app configuration file generated for cti on 2023-05-26T11:03:37+02:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
 app = "cti"
-
+primary_region = "fra"
 kill_signal = "SIGINT"
-kill_timeout = 16 # a second longer than the app's graceful shutdown timer
-
-processes = []
-
-[build]
-dockerfile = "Dockerfile"
-build-target = "production"
-
-[deploy]
-strategy = "bluegreen"
-
-[env]
-RUST_LOG = "info"
-RUST_BACKTRACE = "full"
-PORT = "3000"
-HOST_IP = "0.0.0.0"
-
-# is a fly secret: DATABASE_URL = "…"
-# is a fly secret: DATABASE_ADMIN_URL = "…"
-
-# https://neon.tech/docs/connect/connection-pooling/ - 1000 total
-# we have only 3 instances (single process each)
-# during deployments this could go up to 6 in worst case, so still within limits
-DATABASE_POOL_SIZE = "100"
+kill_timeout = "16s"
 
 [experimental]
-allowed_public_ports = []
-auto_rollback = true
+  auto_rollback = true
+
+[build]
+  dockerfile = "Dockerfile"
+  build-target = "production"
+
+[env]
+  DATABASE_POOL_SIZE = "100"
+  HOST_IP = "0.0.0.0"
+  PORT = "3000"
+  RUST_BACKTRACE = "full"
+  RUST_LOG = "info"
 
 [[services]]
-internal_port = 3000
-protocol = "tcp"
-processes = ["app"]
-http_checks = []
-script_checks = []
+  protocol = "tcp"
+  internal_port = 3000
+  processes = ["app"]
 
-[services.concurrency]
-type = "connections"
-hard_limit = 250
-soft_limit = 200
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
 
-[[services.ports]]
-handlers = ["http"]
-port = 80
-force_https = true
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+    [services.ports.tls_options]
+      alpn = ["h2", "http/1.1"]
+      versions = ["TLSv1.2", "TLSv1.3"]
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 250
+    soft_limit = 200
 
-[[services.ports]]
-# (instead of "http"): "proxy_proto" to pass through client IP info,
-# but requires to speak the PROXY protocol:
-# https://www.haproxy.org/download/2.8/doc/proxy-protocol.txt
-handlers = ["tls", "http"]
-port = 443
-tls_options = { "alpn" = ["h2", "http/1.1"], "versions" = ["TLSv1.2", "TLSv1.3"] }
-# tls_options = { "alpn" = ["h2"] }
-
-[[services.tcp_checks]]
-interval = "15s"
-timeout = "2s"
-grace_period = "1s"
-restart_limit = 3
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"
+    grace_period = "1s"
+    restart_limit = 3

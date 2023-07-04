@@ -1,11 +1,11 @@
 # syntax=docker/dockerfile:1-labs
 
-ARG RUST_IMG_VER=1.68.0-bookworm
-ARG BUSYBOX_IMG_VER=1.36.0-glibc
+ARG RUST_IMG_VER=1.70.0-bookworm
+ARG BUSYBOX_IMG_VER=1.36.1-glibc
 # note: do not use :nonroot tag, as it does not work with fly.io
 ARG DISTROLESS_IMG_VER=cc
 
-ARG MAGICPAK_VER=1.3.2
+ARG MAGICPAK_VER=1.4.0
 ARG MAGICPAK_ARCH=x86_64
 
 ARG UPX_VER=4.0.2

@@ -11,4 +11,4 @@ version.workspace = true
 
 [dependencies]
 cti_types = { path = "../cti_types" }
-rpmalloc = { version = "0.2.2", features = ["unlimited_cache", "global_cache", "thread_cache", "adaptive_thread_cache"] }
+rpmalloc = { version = "0.2.2", features = ["unlimited_cache", "adaptive_thread_cache"] }

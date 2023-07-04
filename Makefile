@@ -16,7 +16,7 @@ DOCKER_RUN_ARGS = \
 	-e FLY_REGION=$(FLY_REGION) \
 	-p 3000:3000
 
-STAMP = $(shell bash -c 'date +%gW%V.%w%H%M') # 22W50.12345
+STAMP = $(shell buildstamp minute) # 22W50.12345
 
 ASSETS_DIR = cti_assets/assets
 FRONT_DIR = frontend
@@ -45,11 +45,13 @@ default:
 # fly.io
 
 deploy:
-	fly scale count 1
-	sleep 30
 	fly deploy
-	sleep 30
-	fly scale count 3
+
+# fly scale count 1 --region fra
+# fly scale count 1 --region iad
+# fly scale count 1 --region lax
+scale:
+	fly scale count 3 --max-per-region 1 --region fra,iad,lax
 
 # docker image
 
