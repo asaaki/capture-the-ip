@@ -10,4 +10,4 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-cti_core_runner = { path = "../cti_core_runner" }
+cti_core_runner.workspace = true

@@ -10,9 +10,8 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-cti_types = { path = "../cti_types"}
-cti_env = { path = "../cti_env"}
-
-diesel = { version = "2.1.0", features = ["postgres"] }
+cti_types.workspace = true
+cti_env.workspace = true
+diesel.workspace = true
 diesel_migrations = { version = "2.1.0", features = ["postgres"] }
-rpmalloc = { version = "0.2.2", features = ["unlimited_cache", "global_cache", "thread_cache", "adaptive_thread_cache"] }
+rpmalloc.workspace = true

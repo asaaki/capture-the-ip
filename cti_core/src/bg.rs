@@ -1,5 +1,7 @@
 use crate::{models, prelude::*};
 use chrono::Utc;
+use diesel::{ExpressionMethods, QueryDsl};
+use diesel_async::RunQueryDsl;
 use futures::future::FutureExt;
 use tokio::{
     sync::oneshot::{channel, Receiver, Sender},
@@ -86,14 +88,21 @@ pub(crate) async fn background_runtime(
 
 async fn refresher(pool: &DbPool) -> AppResult {
     let mut conn = pool.get().await?;
-    refresh_block_holders(&mut conn).await?;
-    refresh_global_ranks(&mut conn).await?;
-    refresh_user_ranks(&mut conn).await?;
-    upsert_refreshed_at(&mut conn).await?;
-    Ok(())
+    conn.build_transaction()
+        .serializable()
+        .deferrable()
+        .run(|conn| {
+            Box::pin(async move {
+                refresh_block_holders(conn).await?;
+                refresh_global_ranks(conn).await?;
+                refresh_user_ranks(conn).await?;
+                upsert_refreshed_at(conn).await?;
+                report_on_max_connections(conn).await?;
+                Ok(())
+            })
+        })
+        .await
 }
-
-use diesel_async::RunQueryDsl;
 
 async fn refresh_block_holders(conn: &mut PgConn) -> AppResult {
     diesel::sql_query(REFRESH_BLOCK_HOLDERS_VIEW)
@@ -119,4 +128,28 @@ async fn refresh_user_ranks(conn: &mut PgConn) -> AppResult {
 async fn upsert_refreshed_at(conn: &mut PgConn) -> AppResult {
     models::Timestamp::create(conn, "refresher".into(), Utc::now()).await?;
     Ok(())
+}
+
+async fn report_on_max_connections(conn: &mut PgConn) -> AppResult {
+    let max = {
+        use cti_schema::custom_schema::pg_settings::dsl::*;
+        pg_settings
+            .select(setting)
+            .filter(name.eq("max_connections"))
+            .first::<String>(conn)
+            .await?
+    };
+
+    let current = {
+        use cti_schema::custom_schema::pg_stat_activity::dsl::*;
+        pg_stat_activity
+            .filter(database.eq("neondb"))
+            .count()
+            .first::<i64>(conn)
+            .await?
+    };
+
+    Ok(log::info!(
+        "current connection info\n* max. connections: {max:>5}\n* open connections: {current:>5}"
+    ))
 }

@@ -9,13 +9,15 @@ pub enum RunMode {
     Background = 2,
 }
 
-impl From<u8> for RunMode {
-    fn from(int_mode: u8) -> Self {
+impl TryFrom<u8> for RunMode {
+    type Error = &'static str;
+
+    fn try_from(int_mode: u8) -> Result<Self, Self::Error> {
         match int_mode {
-            0 => RunMode::Dual,
-            1 => RunMode::Api,
-            2 => RunMode::Background,
-            _ => panic!("invalid run mode value selected; allowed: 0, 1, 2"),
+            0 => Ok(RunMode::Dual),
+            1 => Ok(RunMode::Api),
+            2 => Ok(RunMode::Background),
+            _ => Err("invalid run mode value selected; allowed: 0, 1, 2"),
         }
     }
 }

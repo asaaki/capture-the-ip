@@ -10,4 +10,4 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-color-eyre = "0.6.2"
+color-eyre.workspace = true

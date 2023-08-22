@@ -10,4 +10,4 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-diesel = "2.1.0"
+diesel.workspace = true

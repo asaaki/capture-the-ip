@@ -59,7 +59,7 @@ fn get_x_forwarded_for(headers: &HeaderMap, (v4s, v6s): &mut V4AndV6) {
         .and_then(|hv| hv.to_str().ok())
         .map(|s| {
             s.split(',')
-                .flat_map(|s| s.trim().parse::<IpAddr>().ok())
+                .filter_map(|s| s.trim().parse::<IpAddr>().ok())
                 .map(|addr| match addr {
                     IpAddr::V4(v4) => v4s.insert(v4),
                     IpAddr::V6(v6) => v6s.insert(v6),
@@ -82,14 +82,14 @@ fn get_forwarded(headers: &HeaderMap, (v4s, v6s): &mut V4AndV6) {
     headers
         .get_all(FORWARDED)
         .iter()
-        .flat_map(|hv| {
+        .filter_map(|hv| {
             hv.to_str()
                 .ok()
                 .and_then(|s| ForwardedHeaderValue::from_forwarded(s).ok())
                 .map(|f| {
                     f.iter()
                         .filter_map(|fs| fs.forwarded_for.as_ref())
-                        .flat_map(|ff| match ff {
+                        .filter_map(|ff| match ff {
                             Identifier::SocketAddr(a) => Some(a.ip()),
                             Identifier::IpAddr(ip) => Some(*ip),
                             _ => None,

@@ -6,7 +6,7 @@ pub(crate) fn setup() -> AppResult {
     crate::privdrop::privdrop();
 
     if std::env::var_os("RUST_LOG").is_none() {
-        std::env::set_var("RUST_LOG", cti_constants::RUST_LOG)
+        std::env::set_var("RUST_LOG", cti_constants::RUST_LOG);
     }
 
     tracing::start_tracing()?;

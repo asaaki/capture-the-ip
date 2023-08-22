@@ -36,7 +36,7 @@ pub(crate) async fn setup_db() -> GenericResult<DbPool> {
 
     TLS_CONFIG
         .set(tls_config())
-        .map_err(|_| eyre!("client config issue"))?;
+        .map_err(|e| eyre!("client config issue; E={e:?}"))?;
 
     let manager = Manager::new_with_setup(database_url, |url| establish(url).boxed());
     let pool = DbPool::builder(manager)
@@ -66,7 +66,7 @@ async fn establish(database_url: &str) -> ConnectionResult<PgConn> {
     let connector =
         tokio_postgres_rustls::MakeRustlsConnect::new(TLS_CONFIG.get().unwrap().clone());
 
-    let (client, connection) = tokio_postgres::connect(&database_url, connector)
+    let (client, connection) = tokio_postgres::connect(database_url, connector)
         .await
         .map_err(|e| ConnectionError::BadConnection(e.to_string()))?;
 
@@ -87,7 +87,7 @@ fn tls_config() -> ClientConfig {
 
 fn root_store() -> RootCertStore {
     let mut roots = RootCertStore::empty();
-    roots.add_server_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.0.iter().map(|ta| {
+    roots.add_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.iter().map(|ta| {
         rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(
             ta.subject,
             ta.spki,

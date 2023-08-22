@@ -87,3 +87,30 @@ diesel::table! {
         nick -> Text,
     }
 }
+
+// for "show max_connections", but SELECTable
+
+diesel::table! {
+    use diesel::sql_types::*;
+
+    // table has more columns, but we only need the name and setting
+    pg_settings (name) {
+        name -> Text,
+        setting -> Text,
+    }
+}
+
+// for getting current connection count
+
+diesel::table! {
+    use diesel::sql_types::*;
+
+    // table has more columns, but we only need the few here
+    pg_stat_activity (pid) {
+        pid -> Integer,
+        #[sql_name = "datname"]
+        database -> Text,
+        #[sql_name = "usename"]
+        username -> Text,
+    }
+}

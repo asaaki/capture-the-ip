@@ -9,8 +9,11 @@ use tower_http::{
     trace::{DefaultMakeSpan, DefaultOnResponse, TraceLayer},
 };
 
+#[allow(clippy::declare_interior_mutable_const)]
 const SERVER_NAME: HeaderValue = HeaderValue::from_static("cti");
+#[allow(clippy::declare_interior_mutable_const)]
 const H_CTI_MESSAGE_NAME: HeaderName = HeaderName::from_static("cti-message");
+#[allow(clippy::declare_interior_mutable_const)]
 const H_CTI_MESSAGE_VAL: HeaderValue = HeaderValue::from_static("hello!");
 
 pub(crate) struct HttpServerSubSystem {

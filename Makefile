@@ -9,14 +9,14 @@ export FLY_REGION ?= unset
 
 DOCKER_RUN_ARGS = \
 	--rm -ti \
-	--add-host host.docker.internal:host-gateway \
 	-e DATABASE_URL="$(DATABASE_URL)" \
 	-e DATABASE_ADMIN_URL="$(DATABASE_ADMIN_URL)" \
 	-e HOST_IP=0.0.0.0 \
 	-e FLY_REGION=$(FLY_REGION) \
 	-p 3000:3000
 
-STAMP = $(shell buildstamp minute) # 22W50.12345
+TAG ?= latest
+STAMP ?= $(shell buildstamp minute) # 23W42.12345
 
 ASSETS_DIR = cti_assets/assets
 FRONT_DIR = frontend
@@ -58,12 +58,12 @@ scale:
 image: assets
 	docker build -t cti_server:build --target builder .
 	docker build -t cti_server:$(STAMP) .
-	-docker rmi cti_server:latest
-	docker tag cti_server:$(STAMP) cti_server:latest
+	-docker rmi cti_server:$(TAG)
+	docker tag cti_server:$(STAMP) cti_server:$(TAG)
 	docker images cti_server
 
 publish: assets image
-	docker tag cti_server:latest registry.fly.io/cti:$(STAMP)
+	docker tag cti_server:$(TAG) registry.fly.io/cti:$(STAMP)
 	docker push registry.fly.io/cti:$(STAMP)
 
 # local
@@ -107,13 +107,13 @@ $(HTML_FILES): $(ASSETS_DIR)/%: $(FRONT_DIR)/%
 # docker
 
 run:
-	docker run $(DOCKER_RUN_ARGS) cti_server
+	docker run $(DOCKER_RUN_ARGS) cti_server:$(TAG)
 
 run.local:
 	cargo run -p cti_server
 
 shell:
-	docker run $(DOCKER_RUN_ARGS) cti_server sh
+	docker run $(DOCKER_RUN_ARGS) cti_server:$(TAG) sh
 
 shell.build:
 	docker run $(DOCKER_RUN_ARGS) cti_server:build bash

@@ -63,6 +63,8 @@ pub(crate) async fn get_ip(
     }))
 }
 
+static CALM_DOWN_PLEASE: &[&str] = &["explosives.t.me"];
+
 #[instrument(skip(pool))]
 pub(crate) async fn claim_ip(
     ClientIpV4 { ip }: ClientIpV4,
@@ -71,6 +73,16 @@ pub(crate) async fn claim_ip(
 ) -> Result<Html<String>, (StatusCode, String)> {
     if let Some(ip) = ip {
         let mut conn = pool.get().await.map_err(internal_error)?;
+        if CALM_DOWN_PLEASE
+            .iter()
+            .any(|&calm_it| calm_it == claim_req.name)
+        {
+            return Err((
+                StatusCode::TOO_MANY_REQUESTS,
+                "Calm it down and be fair, please".into(),
+            ));
+        }
+
         let capture = Capture::create_from_ip_and_nick_now(&mut conn, ip, &claim_req.name)
             .await
             .map_err(internal_error)?;

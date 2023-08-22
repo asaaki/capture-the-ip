@@ -11,4 +11,4 @@ version.workspace = true
 
 [dependencies]
 biodome = "0.2.1"
-cti_constants = { path = "../cti_constants" }
+cti_constants.workspace = true
