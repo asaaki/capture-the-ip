@@ -2,8 +2,9 @@ use super::helpers::*;
 use crate::{extractors::ClientIpV4, models, prelude::*};
 use axum::{
     extract::{Query, State},
+    headers::{AccessControlAllowOrigin, HeaderMapExt},
     http::StatusCode,
-    response::Html,
+    response::{Html, IntoResponse, Response},
     Json,
 };
 use chrono::NaiveDateTime;
@@ -70,7 +71,7 @@ pub(crate) async fn claim_ip(
     ClientIpV4 { ip }: ClientIpV4,
     claim_req: Query<ClaimRequest>,
     State(pool): QState,
-) -> Result<Html<String>, (StatusCode, String)> {
+) -> Result<Response, (StatusCode, String)> {
     if let Some(ip) = ip {
         let mut conn = pool.get().await.map_err(internal_error)?;
         if CALM_DOWN_PLEASE
@@ -79,7 +80,7 @@ pub(crate) async fn claim_ip(
         {
             return Err((
                 StatusCode::TOO_MANY_REQUESTS,
-                "Calm it down and be fair, please".into(),
+                "Calm it down and be fair, please".to_string(),
             ));
         }
 
@@ -90,7 +91,7 @@ pub(crate) async fn claim_ip(
         let ip = capture.get_ip();
         let (nick, unick) = (&capture.nick, urlencoding::encode(&capture.nick));
 
-        Ok(Html(indoc::formatdoc!(
+        let mut response = Html(indoc::formatdoc!(
             r#"
                 <!doctype html>
                 <title>The IP {ip:?} was claimed for {nick}.</title>
@@ -99,7 +100,15 @@ pub(crate) async fn claim_ip(
                 <p>The IP {ip:?} was claimed for <a href="/users.html?name={unick}">{nick}</a>.
                 <p><a href=/>Back to homepage</a>
         "#
-        )))
+        ))
+        .into_response();
+
+        // fixes https://github.com/asaaki/capture-the-ip/issues/3
+        response
+            .headers_mut()
+            .typed_insert(AccessControlAllowOrigin::ANY);
+
+        Ok(response)
     } else {
         Err((StatusCode::BAD_REQUEST, "bad request, sorry".to_string()))
     }

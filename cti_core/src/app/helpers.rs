@@ -1,5 +1,8 @@
 use crate::prelude::*;
-use axum::{http::StatusCode, response::IntoResponse};
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+};
 use std::fmt;
 use tracing::instrument;
 
@@ -11,4 +14,9 @@ pub(crate) async fn handler_404() -> impl IntoResponse {
 #[instrument]
 pub(crate) fn internal_error<E: fmt::Display + fmt::Debug>(err: E) -> (StatusCode, String) {
     (StatusCode::INTERNAL_SERVER_ERROR, err.to_string())
+}
+
+#[instrument]
+pub(crate) fn internal_error_response<E: fmt::Display + fmt::Debug>(err: E) -> Response {
+    internal_error(err).into_response()
 }
