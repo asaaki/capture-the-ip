@@ -64,7 +64,7 @@ pub(crate) async fn get_ip(
     }))
 }
 
-static CALM_DOWN_PLEASE: &[&str] = &["explosives.t.me"];
+static CALM_DOWN_PLEASE: &[&str] = &[];
 
 #[instrument(skip(pool))]
 pub(crate) async fn claim_ip(
