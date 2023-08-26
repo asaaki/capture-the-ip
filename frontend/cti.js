@@ -74,7 +74,7 @@
         document.getElementById(
             'last-updated'
         ).innerText = `(Last updated ${ago(
-            Date.parse(last_updated_at + 'Z'),
+            Date.parse(last_updated_at),
             1
         )})`;
     };

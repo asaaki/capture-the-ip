@@ -19,4 +19,4 @@ select distinct b.blck, t.is_tied, (case when t.is_tied then 'tied' else b.nick 
 from block_claims b
 join ties t on b.blck = t.blck and b.rank = t.rank
 where b.rank = 1
-order by b.blck asc
+order by b.blck asc;

@@ -1,4 +1,4 @@
-pub type GenericResult<T> = color_eyre::Result<T>;
+pub type GenericResult<T> = anyhow::Result<T>;
 pub type AppResult = GenericResult<()>;
 pub type AnyResult = Result<(), Box<dyn std::error::Error + Send + Sync + 'static>>;
 

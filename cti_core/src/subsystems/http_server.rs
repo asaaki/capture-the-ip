@@ -1,6 +1,6 @@
 use crate::{app, prelude::*};
 use axum::http::header::{HeaderMap, HeaderName, HeaderValue, SERVER};
-use std::{net::SocketAddr, time::Duration};
+use std::time::Duration;
 use tokio_graceful_shutdown::SubsystemHandle;
 use tower_default_headers::DefaultHeadersLayer;
 use tower_http::{
@@ -43,7 +43,7 @@ impl HttpServerSubSystem {
             .http1_header_read_timeout(Duration::from_secs(5))
             .http1_half_close(true)
             .http2_enable_connect_protocol()
-            .serve(app.into_make_service_with_connect_info::<SocketAddr>())
+            .serve(app.into_make_service())
             .with_graceful_shutdown(subsys.on_shutdown_requested())
             .await
             .map_err(Into::into)

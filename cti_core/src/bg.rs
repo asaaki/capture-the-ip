@@ -1,5 +1,4 @@
 use crate::{models, prelude::*};
-use chrono::Utc;
 use diesel::{ExpressionMethods, QueryDsl};
 use diesel_async::RunQueryDsl;
 use futures::future::FutureExt;
@@ -126,7 +125,7 @@ async fn refresh_user_ranks(conn: &mut PgConn) -> AppResult {
 }
 
 async fn upsert_refreshed_at(conn: &mut PgConn) -> AppResult {
-    models::Timestamp::create(conn, "refresher".into(), Utc::now()).await?;
+    models::Timestamp::create(conn, "refresher".into(), time::OffsetDateTime::now_utc()).await?;
     Ok(())
 }
 

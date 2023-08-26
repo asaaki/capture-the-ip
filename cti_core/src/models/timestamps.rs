@@ -2,8 +2,6 @@ use std::borrow::Cow;
 
 use crate::prelude::*;
 use crate::types::PgConn;
-use chrono::naive::serde::ts_seconds::serialize as to_ts;
-use chrono::{prelude::*, NaiveDateTime};
 use cti_schema::schema::timestamps;
 use cti_types::GenericResult;
 use diesel::{prelude::*, upsert::*};
@@ -13,19 +11,16 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Deserialize, Serialize, Queryable, Insertable)]
 pub(crate) struct Timestamp<'a> {
     pub(crate) id: Cow<'a, str>,
-    #[serde(serialize_with = "to_ts")]
-    pub(crate) stamped_at: NaiveDateTime,
+    #[serde(with = "time::serde::timestamp")]
+    pub(crate) stamped_at: time::OffsetDateTime,
 }
 
 impl<'a> Timestamp<'a> {
     pub async fn create(
         conn: &mut PgConn,
         id: Cow<'a, str>,
-        ts: DateTime<Utc>,
+        stamped_at: time::OffsetDateTime,
     ) -> GenericResult<Timestamp<'a>> {
-        let stamped_at =
-            chrono::NaiveDateTime::from_timestamp_opt(ts.timestamp(), ts.timestamp_subsec_nanos())
-                .unwrap();
         let value = Self { id, stamped_at };
 
         diesel::insert_into(timestamps::table)
@@ -38,6 +33,6 @@ impl<'a> Timestamp<'a> {
             ))
             .get_result(conn)
             .await
-            .map_err(|e| eyre!("query issue: {e}"))
+            .map_err(|e| anyhow!("query issue: {e}"))
     }
 }

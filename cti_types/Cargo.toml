@@ -10,4 +10,4 @@ repository.workspace = true
 version.workspace = true
 
 [dependencies]
-color-eyre.workspace = true
+anyhow.workspace = true

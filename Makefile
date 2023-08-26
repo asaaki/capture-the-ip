@@ -22,12 +22,10 @@ ASSETS_DIR = cti_assets/assets
 FRONT_DIR = frontend
 
 JS_FILES = \
-	$(ASSETS_DIR)/cti.js \
-	$(ASSETS_DIR)/cti.v1.js
+	$(ASSETS_DIR)/cti.js
 
 CSS_FILES = \
-	$(ASSETS_DIR)/cti.css \
-	$(ASSETS_DIR)/cti.v1.css
+	$(ASSETS_DIR)/cti.css
 
 HTML_FILES = \
 	$(ASSETS_DIR)/index.html \

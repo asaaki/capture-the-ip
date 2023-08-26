@@ -2,7 +2,6 @@ use crate::prelude::*;
 use crate::tracing;
 
 pub(crate) fn setup() -> AppResult {
-    color_eyre::install()?;
     crate::privdrop::privdrop();
 
     if std::env::var_os("RUST_LOG").is_none() {

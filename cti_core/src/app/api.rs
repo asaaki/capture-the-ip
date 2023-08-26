@@ -7,7 +7,6 @@ use axum::{
     response::{Html, IntoResponse, Response},
     Json,
 };
-use chrono::NaiveDateTime;
 use diesel::{ExpressionMethods, QueryDsl};
 use diesel_async::RunQueryDsl;
 use serde::{Deserialize, Serialize};
@@ -25,8 +24,7 @@ pub(crate) struct ClaimRequest {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub(crate) struct GetIpResponse {
-    ip: Option<Ipv4Addr>,
-    v4: bool,
+    ip: Ipv4Addr,
 }
 
 #[derive(Debug, Serialize)]
@@ -36,19 +34,22 @@ pub(crate) struct RecentClaimsResponse {
 
 #[derive(Debug, Serialize)]
 pub(crate) struct UserRankingResponse {
-    last_updated_at: NaiveDateTime,
+    #[serde(with = "time::serde::rfc3339")]
+    last_updated_at: time::OffsetDateTime,
     rankings: Vec<UserRanking>,
 }
 
 #[derive(Debug, Serialize)]
 pub(crate) struct BlockHoldersResponse {
-    last_updated_at: NaiveDateTime,
+    #[serde(with = "time::serde::rfc3339")]
+    last_updated_at: time::OffsetDateTime,
     blocks: Vec<BlockHolders>,
 }
 
 #[derive(Debug, Serialize)]
 pub(crate) struct RankingResponse {
-    last_updated_at: NaiveDateTime,
+    #[serde(with = "time::serde::rfc3339")]
+    last_updated_at: time::OffsetDateTime,
     rankings: Vec<Ranking>,
 }
 
@@ -58,10 +59,7 @@ pub(crate) struct RankingResponse {
 pub(crate) async fn get_ip(
     ClientIpV4 { ip }: ClientIpV4,
 ) -> Result<Json<GetIpResponse>, (StatusCode, String)> {
-    Ok(Json(GetIpResponse {
-        ip,
-        v4: ip.is_some(),
-    }))
+    Ok(Json(GetIpResponse { ip }))
 }
 
 static CALM_DOWN_PLEASE: &[&str] = &[];
@@ -72,46 +70,42 @@ pub(crate) async fn claim_ip(
     claim_req: Query<ClaimRequest>,
     State(pool): QState,
 ) -> Result<Response, (StatusCode, String)> {
-    if let Some(ip) = ip {
-        let mut conn = pool.get().await.map_err(internal_error)?;
-        if CALM_DOWN_PLEASE
-            .iter()
-            .any(|&calm_it| calm_it == claim_req.name)
-        {
-            return Err((
-                StatusCode::TOO_MANY_REQUESTS,
-                "Calm it down and be fair, please".to_string(),
-            ));
-        }
-
-        let capture = Capture::create_from_ip_and_nick_now(&mut conn, ip, &claim_req.name)
-            .await
-            .map_err(internal_error)?;
-
-        let ip = capture.get_ip();
-        let (nick, unick) = (&capture.nick, urlencoding::encode(&capture.nick));
-
-        let mut response = Html(indoc::formatdoc!(
-            r#"
-                <!doctype html>
-                <title>The IP {ip:?} was claimed for {nick}.</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1">
-                <link rel="stylesheet" href="/cti.css">
-                <p>The IP {ip:?} was claimed for <a href="/users.html?name={unick}">{nick}</a>.
-                <p><a href=/>Back to homepage</a>
-        "#
-        ))
-        .into_response();
-
-        // fixes https://github.com/asaaki/capture-the-ip/issues/3
-        response
-            .headers_mut()
-            .typed_insert(AccessControlAllowOrigin::ANY);
-
-        Ok(response)
-    } else {
-        Err((StatusCode::BAD_REQUEST, "bad request, sorry".to_string()))
+    let mut conn = pool.get().await.map_err(internal_error)?;
+    if CALM_DOWN_PLEASE
+        .iter()
+        .any(|&calm_it| calm_it == claim_req.name)
+    {
+        return Err((
+            StatusCode::TOO_MANY_REQUESTS,
+            "Calm it down and be fair, please".to_string(),
+        ));
     }
+
+    let capture = Capture::create_from_ip_and_nick_now(&mut conn, ip, &claim_req.name)
+        .await
+        .map_err(internal_error)?;
+
+    let ip = capture.get_ip();
+    let (nick, unick) = (&capture.nick, urlencoding::encode(&capture.nick));
+
+    let mut response = Html(indoc::formatdoc!(
+        r#"
+            <!doctype html>
+            <title>The IP {ip:?} was claimed for {nick}.</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <link rel="stylesheet" href="/cti.css">
+            <p>The IP {ip:?} was claimed for <a href="/users.html?name={unick}">{nick}</a>.
+            <p><a href=/>Back to homepage</a>
+    "#
+    ))
+    .into_response();
+
+    // fixes https://github.com/asaaki/capture-the-ip/issues/3
+    response
+        .headers_mut()
+        .typed_insert(AccessControlAllowOrigin::ANY);
+
+    Ok(response)
 }
 
 #[instrument(skip(pool))]

@@ -36,7 +36,7 @@ pub(crate) async fn setup_db() -> GenericResult<DbPool> {
 
     TLS_CONFIG
         .set(tls_config())
-        .map_err(|e| eyre!("client config issue; E={e:?}"))?;
+        .map_err(|e| anyhow!("client config issue; E={e:?}"))?;
 
     let manager = Manager::new_with_setup(database_url, |url| establish(url).boxed());
     let pool = DbPool::builder(manager)

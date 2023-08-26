@@ -1,11 +1,10 @@
 use crate::prelude::*;
 use axum::{
     body::{boxed, Full},
-    http::{header, Uri},
+    http::{header, StatusCode, Uri},
     response::Response,
 };
 use cti_assets::Assets;
-use hyper::StatusCode;
 
 const INDEX_HTML: &str = "index.html";
 

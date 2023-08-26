@@ -24,4 +24,4 @@ select b.blck, b.rank, m.max_rank, t.is_tied, b.claims, b.nick
 from block_claims b
 join max_rank m on b.blck = m.blck
 join ties t on b.blck = t.blck and b.rank = t.rank
-order by b.blck asc, b.rank asc
+order by b.blck asc, b.rank asc;

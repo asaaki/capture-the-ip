@@ -1,7 +1,5 @@
 use crate::GenericResult;
 use crate::{database::schema::captures, prelude::*};
-use chrono::naive::serde::ts_seconds::serialize as to_ts;
-use chrono::{prelude::*, NaiveDateTime};
 use diesel::{prelude::*, upsert::*};
 use diesel_async::RunQueryDsl;
 use serde::{Deserialize, Serialize, Serializer};
@@ -14,8 +12,8 @@ pub(crate) struct Capture {
     #[serde(rename = "block")]
     pub(crate) blck: i16,
     pub(crate) nick: String,
-    #[serde(serialize_with = "to_ts")]
-    pub(crate) claimed_at: NaiveDateTime,
+    #[serde(with = "time::serde::timestamp")]
+    pub(crate) claimed_at: time::OffsetDateTime,
 }
 
 fn i32_to_ip<S: Serializer>(i: &i32, serializer: S) -> Result<S::Ok, S::Error> {
@@ -47,7 +45,7 @@ impl Capture {
             ))
             .get_result(conn)
             .await
-            .map_err(|e| eyre!("query issue: {e}"))
+            .map_err(|e| anyhow!("query issue: {e}"))
     }
 
     #[allow(dead_code)]
@@ -65,7 +63,7 @@ impl Capture {
             ))
             .get_result(conn)
             .await
-            .map_err(|e| eyre!("query issue: {e}"))
+            .map_err(|e| anyhow!("query issue: {e}"))
     }
 
     pub(crate) fn get_ip(&self) -> Ipv4Addr {
@@ -79,23 +77,18 @@ pub(crate) struct NewCapture<'a> {
     pub(crate) ip: i32,
     pub(crate) blck: i16,
     pub(crate) nick: std::borrow::Cow<'a, str>,
-    pub(crate) claimed_at: NaiveDateTime,
+    pub(crate) claimed_at: time::OffsetDateTime,
 }
 
 impl<'a> NewCapture<'a> {
     pub(crate) fn create_from_ip_and_nick_now(ip: Ipv4Addr, nick: Cow<'a, str>) -> Self {
-        let blck = ip.octets()[0] as i16;
-        let ip = i32::from_be_bytes(ip.octets());
-        let utc: DateTime<Utc> = Utc::now();
-        let claimed_at =
-            NaiveDateTime::from_timestamp_opt(utc.timestamp(), utc.timestamp_subsec_nanos())
-                .unwrap();
+        let octets = ip.octets();
 
         Self {
-            ip,
-            blck,
             nick,
-            claimed_at,
+            ip: i32::from_be_bytes(octets),
+            blck: octets[0] as i16,
+            claimed_at: time::OffsetDateTime::now_utc(),
         }
     }
 }
