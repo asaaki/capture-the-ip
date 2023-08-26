@@ -1,0 +1,4 @@
+source_up
+
+export BUILDKIT_PROGRESS=plain
+export DATABASE_URL=postgres://cti_user:example@localhost:5432/cti_dev_diesel
