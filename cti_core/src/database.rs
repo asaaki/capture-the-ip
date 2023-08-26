@@ -3,13 +3,12 @@ use deadpool_diesel::{PoolConfig, Timeouts};
 use diesel::{ConnectionError, ConnectionResult};
 use diesel_async::RunQueryDsl;
 use futures::FutureExt;
-use once_cell::sync::OnceCell;
 use rustls::{ClientConfig, RootCertStore};
-use std::time::Duration;
+use std::{time::Duration, sync::OnceLock};
 
 pub(crate) use cti_schema::*;
 
-static TLS_CONFIG: OnceCell<ClientConfig> = OnceCell::new();
+static TLS_CONFIG: OnceLock<ClientConfig> = OnceLock::new();
 
 pub(crate) async fn setup_db() -> GenericResult<DbPool> {
     let database_url = if crate::utils::is_home() {

@@ -341,7 +341,6 @@ dependencies = [
  "log",
  "mime_guess",
  "nix",
- "once_cell",
  "privdrop",
  "rustls",
  "serde",
