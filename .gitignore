@@ -3,7 +3,7 @@
 /target
 /tmp/*
 !/tmp/.keep
-
 .crates.toml
 .crates2.json
+.envrc
 node_modules
