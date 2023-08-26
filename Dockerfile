@@ -68,16 +68,6 @@ RUN magicpak \
     --include '/lib/x86_64-linux-gnu/libnss_*' \
     -v
 
-### busybox ###
-
-FROM busybox:1.36.1-musl as shell
-
-WORKDIR /shell
-
-RUN cd /shell; \
-    cp /bin/busybox .; \
-    for c in $(./busybox --list); do ln -s ./busybox ./$c; done
-
 # ### prod image ### #
 
 # note: do not use :nonroot tag, as it does not work with fly.io
@@ -96,6 +86,12 @@ COPY --from=builder --chown=1001:1001 /bundle /.
 COPY --from=builder /var/empty /var/empty
 COPY --link --from=ghcr.io/markentier/utilities:all-in-one /busybox /bin
 
+COPY <<-"SCRIPT" /run.sh
+	#!/bin/sh
+	/cti/cti_server
+SCRIPT
+RUN chmod +x /run.sh
+
 USER 1001:1001
 
-CMD ["/cti/cti_server"]
+CMD ["/run.sh"]
