@@ -53,8 +53,8 @@ scale:
 
 # docker image
 
+# docker build -t cti_server:build --target builder .
 image: assets
-	docker build -t cti_server:build --target builder .
 	docker build -t cti_server:$(STAMP) .
 	-docker rmi cti_server:$(TAG)
 	docker tag cti_server:$(STAMP) cti_server:$(TAG)
