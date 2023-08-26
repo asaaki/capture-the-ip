@@ -26,6 +26,9 @@ kill_timeout = "16s"
   protocol = "tcp"
   internal_port = 3000
   processes = ["app"]
+  concurrency.type = "connections"
+  concurrency.hard_limit = 1000
+  concurrency.soft_limit = 500
 
   [[services.ports]]
     port = 80
@@ -35,13 +38,8 @@ kill_timeout = "16s"
   [[services.ports]]
     port = 443
     handlers = ["tls", "http"]
-    [services.ports.tls_options]
-      alpn = ["h2", "http/1.1"]
-      versions = ["TLSv1.2", "TLSv1.3"]
-  [services.concurrency]
-    type = "connections"
-    hard_limit = 1000
-    soft_limit = 500
+    tls_options.alpn = ["h2", "http/1.1"]
+    tls_options.versions = ["TLSv1.2", "TLSv1.3"]
 
   [[services.tcp_checks]]
     interval = "15s"
