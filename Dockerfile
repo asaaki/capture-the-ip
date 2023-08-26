@@ -2,15 +2,6 @@
 
 FROM rust:1.72.0-bookworm as builder
 
-ARG MAGICPAK_VER=1.4.0
-ARG MAGICPAK_ARCH=x86_64
-
-ARG UPX_VER=4.1.0
-ARG UPX_ARCH=amd64
-
-ARG SCCACHE_VER=v0.5.4
-ARG SCCACHE_ARCH=x86_64
-
 ENV DEBIAN_FRONTEND noninteractive
 
 # https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/reference.md#example-cache-apt-packages
@@ -26,13 +17,9 @@ RUN \
 
 RUN update-ca-certificates --fresh
 
-ADD --link --chmod=0755 https://github.com/coord-e/magicpak/releases/download/v${MAGICPAK_VER}/magicpak-${MAGICPAK_ARCH}-unknown-linux-musl /usr/bin/magicpak
-
-RUN wget -O upx.tar.xz https://github.com/upx/upx/releases/download/v${UPX_VER}/upx-${UPX_VER}-${UPX_ARCH}_linux.tar.xz && \
-    tar -xf upx.tar.xz --directory /usr/bin --strip-components=1 $(tar -tf upx.tar.xz | grep -E 'upx$')
-
-RUN wget -O sccache.tar.gz https://github.com/mozilla/sccache/releases/download/${SCCACHE_VER}/sccache-${SCCACHE_VER}-${SCCACHE_ARCH}-unknown-linux-musl.tar.gz && \
-    tar -xf sccache.tar.gz --directory /usr/bin --strip-components=1 $(tar -tf sccache.tar.gz | grep -E 'sccache$')
+COPY --link  --from=ghcr.io/markentier/utilities:all-in-one /usr/bin/magicpak /usr/bin/magicpak
+COPY --link  --from=ghcr.io/markentier/utilities:all-in-one /usr/bin/upx /usr/bin/upx
+COPY --link  --from=ghcr.io/markentier/utilities:all-in-one /usr/bin/sccache /usr/bin/sccache
 
 ENV SCCACHE_DIR=/tmp/sccache \
     SCCACHE_CACHE_SIZE=2G \
@@ -107,7 +94,7 @@ ENV PATH=/cti:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 COPY --from=builder --chown=1001:1001 /bundle /.
 COPY --from=builder /var/empty /var/empty
-COPY --from=shell /shell /bin
+COPY --link --from=ghcr.io/markentier/utilities:all-in-one /busybox /bin
 
 USER 1001:1001
 
