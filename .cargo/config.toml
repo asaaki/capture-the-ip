@@ -21,7 +21,11 @@ serve = "run --package cti_server"
 sdev = "run --package cti_server"
 
 [env]
-HELLO = { value = "world" }
+HELLO = { value = "world", force = true }
+# can be configured in code as well:
+# AXUM_HTTP_REQUESTS_TOTAL = "cti_requests_total"
+# AXUM_HTTP_REQUESTS_DURATION_SECONDS = "cti_requests_duration_seconds"
+# AXUM_HTTP_REQUESTS_PENDING = "cti_requests_pending"
 
 [target.'cfg(all())']
 rustflags = [

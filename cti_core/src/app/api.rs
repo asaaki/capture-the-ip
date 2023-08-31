@@ -64,30 +64,33 @@ pub(crate) async fn get_ip(
 
 static CALM_DOWN_PLEASE: &[&str] = &[];
 
-#[instrument(skip(pool))]
+#[instrument(skip(_pool))]
 pub(crate) async fn claim_ip(
     ClientIpV4 { ip }: ClientIpV4,
     claim_req: Query<ClaimRequest>,
-    State(pool): QState,
+    State((_pool, sender)): QState,
 ) -> Result<Response, (StatusCode, String)> {
-    let mut conn = pool.get().await.map_err(internal_error)?;
-    if CALM_DOWN_PLEASE
-        .iter()
-        .any(|&calm_it| calm_it == claim_req.name)
-    {
+    let nick = &claim_req.name;
+
+    // let mut conn = pool.get().await.map_err(internal_error)?;
+    if CALM_DOWN_PLEASE.iter().any(|&calm_it| calm_it == nick) {
         return Err((
             StatusCode::TOO_MANY_REQUESTS,
             "Calm it down and be fair, please".to_string(),
         ));
     }
-
-    let capture = Capture::create_from_ip_and_nick_now(&mut conn, ip, &claim_req.name)
-        .await
+    let claim = NewCapture::create_from_ip_and_nick_now(ip, nick.into());
+    sender
+        .send(claim)
+        .map_err(|e| {
+            format!(
+                "Could not send claim for {} to background thread: {}",
+                nick, e
+            )
+        })
         .map_err(internal_error)?;
 
-    let ip = capture.get_ip();
-    let (nick, unick) = (&capture.nick, urlencoding::encode(&capture.nick));
-
+    let unick = urlencoding::encode(nick);
     let mut response = Html(indoc::formatdoc!(
         r#"
             <!doctype html>
@@ -95,7 +98,7 @@ pub(crate) async fn claim_ip(
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <link rel="stylesheet" href="/cti.css">
             <p>The IP {ip:?} was claimed for <a href="/users.html?name={unick}">{nick}</a>.
-            <p><a href=/>Back to homepage</a>
+            <p><a href="/">Back to homepage</a>
     "#
     ))
     .into_response();
@@ -110,7 +113,7 @@ pub(crate) async fn claim_ip(
 
 #[instrument(skip(pool))]
 pub(crate) async fn get_recent_claims(
-    State(pool): QState,
+    State((pool, _sender)): QState,
 ) -> Result<Json<RecentClaimsResponse>, (StatusCode, String)> {
     use crate::database::schema::captures::dsl::*;
     let mut conn = pool.get().await.map_err(internal_error)?;
@@ -129,7 +132,7 @@ pub(crate) async fn get_recent_claims(
 #[instrument(skip(pool))]
 pub(crate) async fn user_ranking(
     claim_req: Query<ClaimRequest>,
-    State(pool): QState,
+    State((pool, _sender)): QState,
 ) -> Result<Json<UserRankingResponse>, (StatusCode, String)> {
     use crate::database::custom_schema::user_ranking::dsl::*;
     let mut conn = pool.get().await.map_err(internal_error)?;
@@ -158,7 +161,7 @@ pub(crate) async fn user_ranking(
 
 #[instrument(skip(pool))]
 pub(crate) async fn get_block_holders(
-    State(pool): QState,
+    State((pool, _sender)): QState,
 ) -> Result<Json<BlockHoldersResponse>, (StatusCode, String)> {
     use crate::database::custom_schema::block_holders::dsl::*;
     let mut conn = pool.get().await.map_err(internal_error)?;
@@ -193,7 +196,7 @@ macro_rules! ranking_handler_for {
         concat_idents::concat_idents!(fn_name = get_, $schema {
         #[instrument(skip(pool))]
         pub(crate) async fn fn_name (
-            State(pool): QState,
+            State((pool, _sender)): QState,
         ) -> Result<Json<RankingResponse>, (StatusCode, String)> {
             use crate::database::custom_schema::$schema::dsl::*;
 

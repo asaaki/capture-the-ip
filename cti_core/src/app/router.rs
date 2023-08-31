@@ -4,12 +4,18 @@ use axum::{
     routing::{any, get},
     Router,
 };
+use axum_prometheus::PrometheusMetricLayerBuilder;
 
 #[cfg(debug_assertions)]
 use super::debug::*;
 
-pub(crate) fn router(pool: DbPool) -> Router {
-    let state: AppState = pool;
+pub(crate) fn router(pool: DbPool, sender: ClaimsSender) -> Router {
+    let state: AppState = (pool, sender);
+    let (prometheus_layer, metric_handle) = PrometheusMetricLayerBuilder::new()
+        .with_prefix("cti")
+        .with_ignore_patterns(&["/metrics", "/sensitive"])
+        .with_default_metrics()
+        .build_pair();
 
     let users_routes = Router::new().route("/", get(user_ranking));
     let ranks_routes = Router::new()
@@ -50,5 +56,9 @@ pub(crate) fn router(pool: DbPool) -> Router {
         .fallback(static_handler)
         .layer(tower_helmet::HelmetLayer::with_defaults());
 
-    app_router.fallback_service(static_router).with_state(state)
+    app_router
+        .route("/metrics", get(|| async move { metric_handle.render() }))
+        .fallback_service(static_router)
+        .layer(prometheus_layer)
+        .with_state(state)
 }

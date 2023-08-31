@@ -18,6 +18,7 @@ const H_CTI_MESSAGE_VAL: HeaderValue = HeaderValue::from_static("hello!");
 
 pub(crate) struct HttpServerSubSystem {
     pub(crate) pool: DbPool,
+    pub(crate) sender: ClaimsSender,
 }
 
 impl HttpServerSubSystem {
@@ -30,7 +31,7 @@ impl HttpServerSubSystem {
         default_headers.insert(SERVER, SERVER_NAME);
         default_headers.insert(H_CTI_MESSAGE_NAME, H_CTI_MESSAGE_VAL);
 
-        let app = app::router(self.pool)
+        let app = app::router(self.pool, self.sender)
             .layer(CompressionLayer::new())
             .layer(DefaultHeadersLayer::new(default_headers))
             .layer(TimeoutLayer::new(Duration::from_secs(30)))

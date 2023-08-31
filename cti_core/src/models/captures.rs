@@ -3,7 +3,7 @@ use crate::{database::schema::captures, prelude::*};
 use diesel::{prelude::*, upsert::*};
 use diesel_async::RunQueryDsl;
 use serde::{Deserialize, Serialize, Serializer};
-use std::{borrow::Cow, net::Ipv4Addr};
+use std::net::Ipv4Addr;
 
 #[derive(Debug, Deserialize, Serialize, Queryable)]
 pub(crate) struct Capture {
@@ -21,6 +21,7 @@ fn i32_to_ip<S: Serializer>(i: &i32, serializer: S) -> Result<S::Ok, S::Error> {
     serializer.serialize_str(&ip)
 }
 
+#[allow(dead_code)]
 impl Capture {
     pub(crate) async fn create_from_ip_and_nick_now(
         conn: &mut PgConn,
@@ -34,24 +35,14 @@ impl Capture {
         .await
     }
 
-    pub(crate) async fn create(conn: &mut PgConn, item: NewCapture<'_>) -> GenericResult<Self> {
-        diesel::insert_into(captures::table)
-            .values(&item)
-            .on_conflict(captures::ip)
-            .do_update()
-            .set((
-                captures::nick.eq(excluded(captures::nick)),
-                captures::claimed_at.eq(excluded(captures::claimed_at)),
-            ))
-            .get_result(conn)
-            .await
-            .map_err(|e| anyhow!("query issue: {e}"))
+    pub(crate) async fn create(conn: &mut PgConn, item: NewCapture) -> GenericResult<Self> {
+        Self::create_many(conn, &[item]).await
     }
 
     #[allow(dead_code)]
     pub(crate) async fn create_many(
         conn: &mut PgConn,
-        items: &[NewCapture<'_>],
+        items: &[NewCapture],
     ) -> GenericResult<Self> {
         diesel::insert_into(captures::table)
             .values(items)
@@ -73,15 +64,15 @@ impl Capture {
 
 #[derive(Debug, Insertable)]
 #[diesel(table_name = captures)]
-pub(crate) struct NewCapture<'a> {
+pub(crate) struct NewCapture {
     pub(crate) ip: i32,
     pub(crate) blck: i16,
-    pub(crate) nick: std::borrow::Cow<'a, str>,
+    pub(crate) nick: String,
     pub(crate) claimed_at: time::OffsetDateTime,
 }
 
-impl<'a> NewCapture<'a> {
-    pub(crate) fn create_from_ip_and_nick_now(ip: Ipv4Addr, nick: Cow<'a, str>) -> Self {
+impl NewCapture {
+    pub(crate) fn create_from_ip_and_nick_now(ip: Ipv4Addr, nick: String) -> Self {
         let octets = ip.octets();
 
         Self {

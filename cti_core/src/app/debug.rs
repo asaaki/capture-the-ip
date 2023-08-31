@@ -25,12 +25,14 @@ pub(crate) async fn request_info(
 
 // Note: use this carefully,
 #[instrument(skip(pool))]
-pub(crate) async fn seed_handler(State(pool): QState) -> Result<Json<bool>, (StatusCode, String)> {
-    let items: Vec<NewCapture<'_>> = (0..100)
+pub(crate) async fn seed_handler(
+    State((pool, _sender)): QState,
+) -> Result<Json<bool>, (StatusCode, String)> {
+    let items: Vec<NewCapture> = (0..100)
         .map(|_| {
             let ip: Ipv4Addr = fakedata_generator::gen_ipv4().parse().unwrap();
             let nick = fakedata_generator::gen_username();
-            NewCapture::create_from_ip_and_nick_now(ip, nick.into())
+            NewCapture::create_from_ip_and_nick_now(ip, nick)
         })
         .collect();
 

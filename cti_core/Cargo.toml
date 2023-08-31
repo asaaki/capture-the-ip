@@ -24,6 +24,7 @@ cti_assets.workspace = true
 
 anyhow.workspace = true
 axum.workspace = true
+axum-prometheus.workspace = true
 concat-idents.workspace = true
 deadpool.workspace = true
 deadpool-diesel.workspace = true
@@ -32,6 +33,7 @@ diesel.workspace = true
 diesel-async.workspace = true
 fakedata_generator.workspace = true
 futures.workspace = true
+itertools.workspace = true
 indoc.workspace = true
 log.workspace = true
 mime_guess.workspace = true
@@ -53,5 +55,5 @@ webpki-roots.workspace = true
 tower-helmet.workspace = true
 
 [target.'cfg(target_os = "linux")'.dependencies]
-nix = "0.26.2"
+nix = { version = "0.27.1", features = ["user"] }
 privdrop = "0.5.4"

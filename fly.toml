@@ -16,19 +16,23 @@ kill_timeout = "16s"
   build-target = "production"
 
 [env]
-  DATABASE_POOL_SIZE = "10"
+  DATABASE_POOL_SIZE = "20"
   HOST_IP = "0.0.0.0"
   PORT = "3000"
   RUST_BACKTRACE = "full"
   RUST_LOG = "info"
+
+[metrics]
+    port = 3000
+    path = "/metrics"
 
 [[services]]
   protocol = "tcp"
   internal_port = 3000
   processes = ["app"]
   concurrency.type = "connections"
-  concurrency.hard_limit = 1000
-  concurrency.soft_limit = 500
+  concurrency.hard_limit = 2000
+  concurrency.soft_limit = 1000
 
   [[services.ports]]
     port = 80

@@ -4,7 +4,7 @@ use diesel::{ConnectionError, ConnectionResult};
 use diesel_async::RunQueryDsl;
 use futures::FutureExt;
 use rustls::{ClientConfig, RootCertStore};
-use std::{time::Duration, sync::OnceLock};
+use std::{sync::OnceLock, time::Duration};
 
 pub(crate) use cti_schema::*;
 
