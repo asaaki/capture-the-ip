@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use deadpool_diesel::{PoolConfig, Timeouts};
 use diesel::{ConnectionError, ConnectionResult};
-use diesel_async::RunQueryDsl;
+use diesel_async::{RunQueryDsl, pooled_connection::ManagerConfig};
 use futures::FutureExt;
 use rustls::{ClientConfig, RootCertStore};
 use std::{sync::OnceLock, time::Duration};
@@ -37,7 +37,9 @@ pub(crate) async fn setup_db() -> GenericResult<DbPool> {
         .set(tls_config())
         .map_err(|e| anyhow!("client config issue; E={e:?}"))?;
 
-    let manager = Manager::new_with_setup(database_url, |url| establish(url).boxed());
+    let mut manager_config = ManagerConfig::default();
+    manager_config.custom_setup = Box::new(|conn| Box::pin(establish(conn)));
+    let manager = Manager::new_with_config(database_url, manager_config);
     let pool = DbPool::builder(manager)
         .config(config)
         .runtime(deadpool::Runtime::Tokio1)

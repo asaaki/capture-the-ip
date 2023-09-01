@@ -33,7 +33,7 @@ deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
 deadpool-diesel = { version = "0.4.1", features = [] }
 deadpool-sync = "0.1.0"
 diesel = { version = "2.1.1", features = ["postgres", "time"] }
-diesel-async = { version = "0.3.2", features = ["deadpool", "postgres"] }
+diesel-async = { version = "0.4.1", features = ["deadpool", "postgres"] }
 fakedata_generator = "0.3.0"
 futures = "0.3.28"
 indoc = "2.0.3"
@@ -51,7 +51,7 @@ tokio-postgres-rustls = "0.10.0"
 tower = { version = "0.4.13", features = ["full", "tokio", "tokio-stream"] }
 tower-default-headers = "0.1.1"
 tower-helmet = "0.2.1"
-tower-http = { version = "0.4.3", features = ["full", "async-compression"] }
+tower-http = { version = "0.4.4", features = ["full", "async-compression"] }
 tracing = { version = "0.1.37" }
 tracing-subscriber = { version = "0.3.17", features = ["env-filter", "json"] }
 url = "2.4.1"
