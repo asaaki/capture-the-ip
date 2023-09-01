@@ -1,8 +1,7 @@
 use crate::prelude::*;
 use deadpool_diesel::{PoolConfig, Timeouts};
 use diesel::{ConnectionError, ConnectionResult};
-use diesel_async::{RunQueryDsl, pooled_connection::ManagerConfig};
-use futures::FutureExt;
+use diesel_async::{pooled_connection::ManagerConfig, RunQueryDsl};
 use rustls::{ClientConfig, RootCertStore};
 use std::{sync::OnceLock, time::Duration};
 
