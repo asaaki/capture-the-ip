@@ -1,18 +1,16 @@
 use crate::prelude::*;
 use futures::future::FutureExt;
 use itertools::Itertools;
+use parking_lot::Mutex;
 use std::sync::Arc;
 use tokio::{
-    sync::{
-        oneshot::{channel, Receiver, Sender},
-        RwLock,
-    },
+    sync::oneshot::{channel, Receiver, Sender},
     time::{interval_at, Duration, Instant},
 };
 
 const REFRESH_INTERVAL: Duration = Duration::from_secs(1);
 
-type ClaimsQueue = Arc<RwLock<Vec<NewCapture>>>;
+type ClaimsQueue = Arc<Mutex<Vec<NewCapture>>>;
 
 pub(crate) struct TerminationToken;
 
@@ -46,37 +44,37 @@ pub(crate) async fn background_runtime(
     let mut interval = interval_at(start, REFRESH_INTERVAL);
     let mut stop_tx = Some(stop_tx);
     let mut claims_receiver = claims_receiver;
-    let queue = ClaimsQueue::new(RwLock::new(Vec::with_capacity(5_000)));
+    let queue = ClaimsQueue::default();
     let (sink, drain) = (queue.clone(), queue.clone());
 
     loop {
         tokio::select! {
             res = &mut bg_rx => {
-                log::info!("Claims thread terminating ...");
+                log::info!("±±± Claims thread terminating ...");
                 let token = res.unwrap_or_else(|e| {
-                    log::error!("Receiver error: {e}");
+                    log::error!("±±± Receiver error: {e}");
                     TerminationToken
                 });
 
                 if let Some(tx) = stop_tx.take() {
                     tx.send(token).unwrap_or_else(|_| {
-                            log::error!("Could not send TerminationToken back to main thread");
+                            log::error!("±±± Could not send TerminationToken back to main thread");
                         });
                 } else {
-                    log::error!("TerminationToken sender consumed already");
+                    log::error!("±±± TerminationToken sender consumed already");
                 }
 
-                log::info!("Claims thread terminated.");
+                log::info!("±±± Claims thread terminated.");
                 break Ok(()); // SUPER IMPORTANT!
             }
             r = claims_receiver.recv() => {
                 if let Some(claim) = r {
-                    sink.write().await.push(claim);
+                    sink.lock().push(claim);
                 }
             }
             _ = interval.tick() => {
                 handler(&pool, &drain).await.unwrap_or_else(|e| {
-                    log::error!("Error on claim writing [report only] {e}");
+                    log::error!("±±± Error on claim writing [report only] {e}");
                 });
             }
         }
@@ -90,13 +88,38 @@ async fn handler(pool: &DbPool, drain: &ClaimsQueue) -> AppResult {
         .deferrable()
         .run(|conn| {
             Box::pin(async move {
-                let mut claims = drain.write().await;
+                let mut claims = {
+                    let mut drain = drain.lock();
+                    std::mem::take(&mut *drain)
+                };
                 let drain_len = claims.len();
                 let drain_cap = claims.capacity();
-                let claims: Vec<_> = claims.drain(..).rev().unique_by(|c| c.ip).collect();
+
+                let claims = claims
+                    .drain(..)
+                    .rev()
+                    .unique_by(|c| c.ip)
+                    .collect::<Vec<_>>();
+
                 if !claims.is_empty() {
-                    log::info!("±±± Writing {} claim(s) to DB; drain vec: {}/{}", claims.len(), drain_len, drain_cap);
-                    Capture::create_many(conn, &claims).await?;
+                    log::info!(
+                        "±±± Writing {} claim(s) to DB; drain vec: {}/{}",
+                        claims.len(),
+                        drain_len,
+                        drain_cap
+                    );
+                    let result = Capture::create_many(conn, &claims).await;
+                    // to not lose claims on error, reinsert them into drain
+                    if let Err(e) = result {
+                        log::error!("±±± Error on claim writing: {e}");
+                        log::info!("±±± Reinserting {} claim(s) into drain", claims.len());
+                        let mut claims = claims;
+                        // hold the lock for as short as possible
+                        {
+                            let mut drain = drain.lock();
+                            drain.extend(claims.drain(..).rev());
+                        }
+                    }
                 }
                 Ok(())
             })
