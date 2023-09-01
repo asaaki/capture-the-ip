@@ -393,6 +393,7 @@ dependencies = [
  "log",
  "mime_guess",
  "nix 0.27.1",
+ "parking_lot",
  "privdrop",
  "rustls",
  "serde",

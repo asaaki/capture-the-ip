@@ -37,6 +37,7 @@ itertools.workspace = true
 indoc.workspace = true
 log.workspace = true
 mime_guess.workspace = true
+parking_lot.workspace = true
 rustls.workspace = true
 serde.workspace = true
 time.workspace = true
