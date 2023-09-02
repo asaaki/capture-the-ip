@@ -78,6 +78,12 @@ RUN magicpak \
 # we can simply use scratch as our base instead of Google's distroless images
 FROM scratch as production
 
+LABEL service="cti_server"
+LABEL tech.markentier.image.service="cti_server"
+LABEL org.opencontainers.image.title="CTI - Capture The IP"
+LABEL org.opencontainers.image.url="https://github.com/asaaki/capture-the-ip"
+LABEL org.opencontainers.image.source="https://github.com/asaaki/capture-the-ip"
+
 ARG RUST_BACKTRACE
 
 ENV PATH=/cti:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
