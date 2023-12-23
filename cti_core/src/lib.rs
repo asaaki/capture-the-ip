@@ -35,6 +35,12 @@ pub extern "C" fn run(mode: RunMode) -> u8 {
 }
 
 fn run_async(mode: RunMode) -> AppResult {
+    let _guard = sentry::init((environment::sentry_dsn(), sentry::ClientOptions {
+        release: sentry::release_name!(),
+        ..Default::default()
+    }));
+    sentry::capture_message("New instance starting ...", sentry::Level::Info);
+
     tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()

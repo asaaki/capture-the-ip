@@ -25,9 +25,8 @@ publish = false
 
 [workspace.dependencies]
 anyhow = { version = "1.0.76" }
-axum = { version = "0.6.20", features = ["headers", "http2", "macros", "ws"] }
-axum-prometheus = "0.4.0"
-# color-eyre = { version = "0.6.2", default-features = false }
+axum = { version = "0.6.20", features = ["headers", "http2", "macros", "ws"] } # BLOCKED until axum 0.7+ ecosystem stabilises
+axum-prometheus = "0.4.0" # depends on axum 0.7
 concat-idents = "1.1.5"
 deadpool = { version = "0.10.0", features = ["rt_tokio_1"] }
 deadpool-diesel = { version = "0.5.0", features = ["postgres"] }
@@ -36,7 +35,7 @@ diesel = { version = "2.1.4", features = ["postgres", "time"] }
 diesel-async = { version = "0.4.1", features = ["deadpool", "postgres"] }
 fakedata_generator = "0.4.0"
 futures = "0.3.29"
-indoc = "2.0.3"
+indoc = "2.0.4"
 itertools = "0.12.0"
 log = "0.4.20"
 mime_guess = "2.0.4"
@@ -44,19 +43,20 @@ parking_lot = { version = "0.12.1", features = [] }
 rpmalloc = { version = "0.2.2", features = ["unlimited_cache", "adaptive_thread_cache"] }
 rustls-pemfile = "2.0.0"
 rustls = "0.22.1"
+sentry = {version = "0.32.1", default-features = false, features = ["backtrace", "contexts", "panic", "transport", "anyhow", "debug-images", "ureq", "rustls", "tracing"] }
 serde = { version = "1.0.188", features = ["derive"] }
 time = { version = "0.3.28", features = ["serde", "formatting"] }
 tokio = { version = "1.32.0", features = [] }
-tokio-graceful-shutdown = "0.13.0"
+tokio-graceful-shutdown = "0.13.0" # needs heavy refactoring!
 tokio-postgres = "0.7.10"
 tokio-postgres-rustls = "0.10.0"
 tower = { version = "0.4.13", features = ["full", "tokio", "tokio-stream"] }
 tower-default-headers = "0.1.1"
 tower-helmet = "0.2.1"
-tower-http = { version = "0.4.4", features = ["full", "async-compression"] }
+tower-http = { version = "0.4.4", features = ["full", "async-compression"] } # depends on new hyper ecosystem (see axum 0.7)
 tracing = { version = "0.1.40" }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
-url = "2.4.1"
+url = "2.5.0"
 urlencoding = "2.1.3"
 webpki-roots = "0.26.0"
 

@@ -95,6 +95,9 @@ COPY --from=builder --chown=1001:1001 /bundle /.
 COPY --from=builder /var/empty /var/empty
 COPY --link --from=ghcr.io/markentier/utilities:all-in-one /busybox /bin
 
+# TODO: this is for sentry crate for now; check if we can customize setup, so we do not depend on this
+COPY --from=builder /usr/lib/ssl/certs /usr/lib/ssl/certs
+
 COPY <<-"SCRIPT" /run.sh
 	#!/bin/sh
 	/cti/cti_server

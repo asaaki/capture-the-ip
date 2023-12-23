@@ -36,3 +36,9 @@ pub fn db_pool_size() -> usize {
 pub fn fly_region() -> String {
     biodome("FLY_REGION", "___")
 }
+
+// sentry
+
+pub fn sentry_dsn() -> Option<String> {
+    std::env::var("SENTRY_DSN").ok()
+}

@@ -8,6 +8,7 @@ pub(crate) fn start_tracing() -> AppResult {
     tracing_subscriber::registry()
         .with(EnvFilter::from_default_env())
         .with(fmt_layer)
+        .with(sentry::integrations::tracing::layer())
         .try_init()?;
     Ok(())
 }
