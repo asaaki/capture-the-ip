@@ -2,7 +2,7 @@ use crate::prelude::*;
 use deadpool_diesel::{PoolConfig, Timeouts};
 use diesel::{ConnectionError, ConnectionResult};
 use diesel_async::{pooled_connection::ManagerConfig, RunQueryDsl};
-use rustls::{ClientConfig, RootCertStore};
+use rustls::{pki_types::CertificateDer, ClientConfig, RootCertStore};
 use std::{sync::OnceLock, time::Duration};
 
 pub(crate) use cti_schema::*;
@@ -26,11 +26,15 @@ pub(crate) async fn setup_db() -> GenericResult<DbPool> {
 
     let max_size = db_pool_size();
     let timeouts = Timeouts {
-        wait: Some(Duration::from_secs(5)),
-        create: Some(Duration::from_secs(5)),
-        recycle: Some(Duration::from_secs(5)),
+        wait: Some(Duration::from_secs(15)),
+        create: Some(Duration::from_secs(15)),
+        recycle: Some(Duration::from_secs(15)),
     };
-    let config = PoolConfig { max_size, timeouts };
+    let config = PoolConfig {
+        max_size,
+        timeouts,
+        ..Default::default()
+    };
 
     TLS_CONFIG
         .set(tls_config())
@@ -80,19 +84,27 @@ async fn establish(database_url: &str) -> ConnectionResult<PgConn> {
 
 fn tls_config() -> ClientConfig {
     ClientConfig::builder()
-        .with_safe_defaults()
         .with_root_certificates(root_store())
         .with_no_client_auth()
 }
 
 fn root_store() -> RootCertStore {
     let mut roots = RootCertStore::empty();
-    roots.add_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.iter().map(|ta| {
-        rustls::OwnedTrustAnchor::from_subject_spki_name_constraints(
-            ta.subject,
-            ta.spki,
-            ta.name_constraints,
-        )
-    }));
+    roots.extend(webpki_roots::TLS_SERVER_ROOTS.iter().cloned());
+    roots.add_parsable_certificates(aws_rds_roots());
     roots
+}
+
+fn aws_rds_roots() -> Vec<CertificateDer<'static>> {
+    let aws_certs = include_bytes!("../../certs/aws-global-bundle.pem");
+    let mut aws_certs = std::io::BufReader::new(aws_certs.as_slice());
+    rustls_pemfile::read_all(&mut aws_certs)
+        .filter_map(|item| {
+            if let Ok(rustls_pemfile::Item::X509Certificate(bytes)) = item {
+                Some(bytes)
+            } else {
+                None
+            }
+        })
+        .collect()
 }

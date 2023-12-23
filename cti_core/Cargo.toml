@@ -39,6 +39,7 @@ log.workspace = true
 mime_guess.workspace = true
 parking_lot.workspace = true
 rustls.workspace = true
+rustls-pemfile.workspace = true
 serde.workspace = true
 time.workspace = true
 tokio.workspace = true

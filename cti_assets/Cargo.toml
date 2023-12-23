@@ -11,4 +11,4 @@ version.workspace = true
 
 [dependencies]
 # https://github.com/pyrossh/rust-embed
-rust-embed = { version = "8.0.0" }
+rust-embed = { version = "8.1.0" }

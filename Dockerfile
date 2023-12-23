@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1-labs
 
-FROM rust:1.72.0-bookworm as builder
+FROM rust:1.74.1-bookworm as builder
+
+ARG RUSTFLAGS
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -17,18 +19,18 @@ RUN \
 
 RUN update-ca-certificates --fresh
 
-COPY --link  --from=ghcr.io/markentier/utilities:all-in-one /usr/bin/magicpak /usr/bin/magicpak
-COPY --link  --from=ghcr.io/markentier/utilities:all-in-one /usr/bin/upx /usr/bin/upx
-COPY --link  --from=ghcr.io/markentier/utilities:all-in-one /usr/bin/sccache /usr/bin/sccache
+COPY --link --from=ghcr.io/markentier/utilities:all-in-one /usr/bin/magicpak /usr/bin/magicpak
+COPY --link --from=ghcr.io/markentier/utilities:all-in-one /usr/bin/upx /usr/bin/upx
+COPY --link --from=ghcr.io/markentier/utilities:all-in-one /usr/bin/sccache /usr/bin/sccache
 
 ENV SCCACHE_DIR=/tmp/sccache \
     SCCACHE_CACHE_SIZE=2G \
     SCCACHE_ERROR_LOG=/tmp/sccache.log
 
-# comment this if you want to not use sccache for building
-ENV CARGO_INCREMENTAL=0 \
-    RUST_LOG=sccache=info \
-    RUSTC_WRAPPER=/usr/bin/sccache
+# # comment this if you want to not use sccache for building
+# ENV CARGO_INCREMENTAL=0 \
+#     RUST_LOG=sccache=info \
+#     RUSTC_WRAPPER=/usr/bin/sccache
 
 RUN adduser \
     --disabled-password \
@@ -45,7 +47,10 @@ WORKDIR /app
 
 COPY . .
 
-RUN rustc --version --verbose && cargo --version --verbose
+RUN rustc --version --verbose && \
+    cargo --version --verbose
+
+RUN echo "CURRENT RUSTFLAGS=${RUSTFLAGS}"
 
 RUN \
   --mount=type=cache,target=/usr/local/cargo/registry \
@@ -83,8 +88,6 @@ LABEL tech.markentier.image.service="cti_server"
 LABEL org.opencontainers.image.title="CTI - Capture The IP"
 LABEL org.opencontainers.image.url="https://github.com/asaaki/capture-the-ip"
 LABEL org.opencontainers.image.source="https://github.com/asaaki/capture-the-ip"
-
-ARG RUST_BACKTRACE
 
 ENV PATH=/cti:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 

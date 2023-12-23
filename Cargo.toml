@@ -24,25 +24,26 @@ edition = "2021"
 publish = false
 
 [workspace.dependencies]
-anyhow = { version = "1.0.75" }
+anyhow = { version = "1.0.76" }
 axum = { version = "0.6.20", features = ["headers", "http2", "macros", "ws"] }
 axum-prometheus = "0.4.0"
-color-eyre = { version = "0.6.2", default-features = false }
+# color-eyre = { version = "0.6.2", default-features = false }
 concat-idents = "1.1.5"
-deadpool = { version = "0.9.5", features = ["rt_tokio_1"] }
-deadpool-diesel = { version = "0.4.1", features = [] }
-deadpool-sync = "0.1.0"
-diesel = { version = "2.1.1", features = ["postgres", "time"] }
+deadpool = { version = "0.10.0", features = ["rt_tokio_1"] }
+deadpool-diesel = { version = "0.5.0", features = ["postgres"] }
+deadpool-sync = "0.1.2"
+diesel = { version = "2.1.4", features = ["postgres", "time"] }
 diesel-async = { version = "0.4.1", features = ["deadpool", "postgres"] }
-fakedata_generator = "0.3.0"
-futures = "0.3.28"
+fakedata_generator = "0.4.0"
+futures = "0.3.29"
 indoc = "2.0.3"
-itertools = "0.11.0"
+itertools = "0.12.0"
 log = "0.4.20"
 mime_guess = "2.0.4"
 parking_lot = { version = "0.12.1", features = [] }
 rpmalloc = { version = "0.2.2", features = ["unlimited_cache", "adaptive_thread_cache"] }
-rustls = "0.21.7"
+rustls-pemfile = "2.0.0"
+rustls = "0.22.1"
 serde = { version = "1.0.188", features = ["derive"] }
 time = { version = "0.3.28", features = ["serde", "formatting"] }
 tokio = { version = "1.32.0", features = [] }
@@ -53,11 +54,11 @@ tower = { version = "0.4.13", features = ["full", "tokio", "tokio-stream"] }
 tower-default-headers = "0.1.1"
 tower-helmet = "0.2.1"
 tower-http = { version = "0.4.4", features = ["full", "async-compression"] }
-tracing = { version = "0.1.37" }
-tracing-subscriber = { version = "0.3.17", features = ["env-filter", "json"] }
+tracing = { version = "0.1.40" }
+tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
 url = "2.4.1"
 urlencoding = "2.1.3"
-webpki-roots = "0.25.2"
+webpki-roots = "0.26.0"
 
 # workspace internal deps
 cti_constants = { path = "cti_constants" }
@@ -78,3 +79,94 @@ rpath = true
 
 [profile.dev.package."*"]
 opt-level = 3
+
+[patch.crates-io]
+tokio-postgres-rustls = { git = "https://github.com/asaaki/tokio-postgres-rustls", branch = "update-rustls" }
+# main; 2023-12-23
+diesel-async = { git = "https://github.com/weiznich/diesel_async", rev = "d7d117f" }
+
+[lints.clippy]
+# transformed from https://github.com/EmbarkStudios/rust-ecosystem/blob/main/lints.rs
+all = "warn"
+await_holding_lock = "warn"
+char_lit_as_u8 = "warn"
+checked_conversions = "warn"
+dbg_macro = "warn"
+debug_assert_with_mut_call = "warn"
+doc_markdown = "warn"
+empty_enum = "warn"
+enum_glob_use = "warn"
+exit = "warn"
+expl_impl_clone_on_copy = "warn"
+explicit_deref_methods = "warn"
+explicit_into_iter_loop = "warn"
+fallible_impl_from = "warn"
+filter_map_next = "warn"
+flat_map_option = "warn"
+float_cmp_const = "warn"
+fn_params_excessive_bools = "warn"
+from_iter_instead_of_collect = "warn"
+if_let_mutex = "warn"
+implicit_clone = "warn"
+imprecise_flops = "warn"
+inefficient_to_string = "warn"
+invalid_upcast_comparisons = "warn"
+large_digit_groups = "warn"
+large_stack_arrays = "warn"
+large_types_passed_by_value = "warn"
+let_unit_value = "warn"
+linkedlist = "warn"
+lossy_float_literal = "warn"
+macro_use_imports = "warn"
+manual_ok_or = "warn"
+map_err_ignore = "warn"
+map_flatten = "warn"
+map_unwrap_or = "warn"
+match_on_vec_items = "warn"
+match_same_arms = "warn"
+match_wild_err_arm = "warn"
+match_wildcard_for_single_variants = "warn"
+mem_forget = "warn"
+mismatched_target_os = "warn"
+missing_enforced_import_renames = "warn"
+mut_mut = "warn"
+mutex_integer = "warn"
+needless_borrow = "warn"
+needless_continue = "warn"
+needless_for_each = "warn"
+option_option = "warn"
+path_buf_push_overwrite = "warn"
+ptr_as_ptr = "warn"
+rc_mutex = "warn"
+ref_option_ref = "warn"
+rest_pat_in_fully_bound_structs = "warn"
+same_functions_in_if_condition = "warn"
+semicolon_if_nothing_returned = "warn"
+single_match_else = "warn"
+string_add_assign = "warn"
+string_add = "warn"
+string_lit_as_bytes = "warn"
+string_to_string = "warn"
+todo = "warn"
+trait_duplication_in_bounds = "warn"
+unimplemented = "warn"
+unnested_or_patterns = "warn"
+unused_self = "warn"
+useless_transmute = "warn"
+verbose_file_reads = "warn"
+zero_sized_map_values = "warn"
+
+# bevy's recommendation
+too_many_arguments = "allow"
+type_complexity = "allow"
+
+[lints.rust]
+# transformed from https://github.com/EmbarkStudios/rust-ecosystem/blob/main/lints.rs
+unsafe_code = "deny"
+future_incompatible = "warn"
+nonstandard_style = "warn"
+rust_2018_idioms = "warn"
+
+# my recommendation (adding '_ everywhere by hand is annoying);
+# this overrides a rust 2018 idiom lint
+elided_lifetimes_in_paths = "allow"

@@ -7,6 +7,11 @@ export DATABASE_ADMIN_URL ?= postgres://$(DB_CRED)@$(DATABASE_HOST)/$(DB_NAME)
 
 export FLY_REGION ?= unset
 
+RUSTFLAGS ?=
+ifneq ($(RUSTFLAGS),)
+	BUILD_ARGS = --build-arg RUSTFLAGS="$(RUSTFLAGS)"
+endif
+
 DOCKER_RUN_ARGS = \
 	--rm -ti \
 	-e DATABASE_URL="$(DATABASE_URL)" \
@@ -20,6 +25,7 @@ STAMP ?= $(shell buildstamp minute) # 23W42.12345
 
 ASSETS_DIR = cti_assets/assets
 FRONT_DIR = frontend
+
 
 JS_FILES = \
 	$(ASSETS_DIR)/cti.js
@@ -55,7 +61,7 @@ scale:
 
 # docker build -t cti_server:build --target builder .
 image: assets
-	docker build -t cti_server:$(STAMP) .
+	docker build $(BUILD_ARGS) -t cti_server:$(STAMP) .
 	-docker rmi cti_server:$(TAG)
 	docker tag cti_server:$(STAMP) cti_server:$(TAG)
 	docker images cti_server

@@ -15,6 +15,10 @@ kill_timeout = "16s"
   dockerfile = "Dockerfile"
   build-target = "production"
 
+[build.args]
+  # https://community.fly.io/t/vcvttsd2usi-illegal-instruction-on-fly-io-but-not-locally-or-on-github-ci/5713/2
+  RUSTFLAGS = "-Clink-arg=-fuse-ld=mold -Ctarget-cpu=znver2"
+
 [env]
   DATABASE_POOL_SIZE = "20"
   HOST_IP = "0.0.0.0"
