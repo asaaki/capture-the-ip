@@ -11,3 +11,6 @@ version.workspace = true
 
 [dependencies]
 cti_core_runner.workspace = true
+
+[lints]
+workspace = true

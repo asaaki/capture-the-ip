@@ -24,7 +24,7 @@ edition = "2021"
 publish = false
 
 [workspace.dependencies]
-anyhow = { version = "1.0.76" }
+anyhow = { version = "1.0.79" }
 axum = { version = "0.6.20", features = ["headers", "http2", "macros", "ws"] } # BLOCKED until axum 0.7+ ecosystem stabilises
 axum-prometheus = "0.4.0" # depends on axum 0.7
 concat-idents = "1.1.5"
@@ -34,22 +34,22 @@ deadpool-sync = "0.1.2"
 diesel = { version = "2.1.4", features = ["postgres", "time"] }
 diesel-async = { version = "0.4.1", features = ["deadpool", "postgres"] }
 fakedata_generator = "0.4.0"
-futures = "0.3.29"
+futures = "0.3.30"
 indoc = "2.0.4"
-itertools = "0.12.0"
+itertools = "0.12.1"
 log = "0.4.20"
 mime_guess = "2.0.4"
 parking_lot = { version = "0.12.1", features = [] }
 rpmalloc = { version = "0.2.2", features = ["unlimited_cache", "adaptive_thread_cache"] }
-rustls-pemfile = "2.0.0"
-rustls = "0.22.1"
-sentry = {version = "0.32.1", default-features = false, features = ["backtrace", "contexts", "panic", "transport", "anyhow", "debug-images", "ureq", "rustls", "tracing"] }
-serde = { version = "1.0.188", features = ["derive"] }
-time = { version = "0.3.28", features = ["serde", "formatting"] }
-tokio = { version = "1.32.0", features = [] }
+rustls-pemfile = "2.1.0"
+rustls = "0.22.2"
+sentry = {version = "0.32.1", default-features = false, features = ["backtrace", "contexts", "panic", "transport", "anyhow", "debug-images", "ureq", "tracing"] }
+serde = { version = "1.0.196", features = ["derive"] }
+time = { version = "0.3.34", features = ["serde", "formatting"] }
+tokio = { version = "1.36.0", features = [] }
 tokio-graceful-shutdown = "0.13.0" # needs heavy refactoring!
 tokio-postgres = "0.7.10"
-tokio-postgres-rustls = "0.10.0"
+tokio-postgres-rustls = "0.11.1"
 tower = { version = "0.4.13", features = ["full", "tokio", "tokio-stream"] }
 tower-default-headers = "0.1.1"
 tower-helmet = "0.2.1"
@@ -58,7 +58,7 @@ tracing = { version = "0.1.40" }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter", "json"] }
 url = "2.5.0"
 urlencoding = "2.1.3"
-webpki-roots = "0.26.0"
+webpki-roots = "0.26.1"
 
 # workspace internal deps
 cti_constants = { path = "cti_constants" }
@@ -67,6 +67,10 @@ cti_types = { path = "cti_types" }
 cti_env = { path = "cti_env" }
 cti_schema = { path = "cti_schema" }
 cti_assets = { path = "cti_assets" }
+
+[patch.crates-io]
+# main; 2024-02-16
+diesel-async = { git = "https://github.com/weiznich/diesel_async", rev = "017ebe2" }
 
 # https://fasterthanli.me/articles/why-is-my-rust-build-so-slow
 [profile.release]
@@ -80,12 +84,8 @@ rpath = true
 [profile.dev.package."*"]
 opt-level = 3
 
-[patch.crates-io]
-tokio-postgres-rustls = { git = "https://github.com/asaaki/tokio-postgres-rustls", branch = "update-rustls" }
-# main; 2023-12-23
-diesel-async = { git = "https://github.com/weiznich/diesel_async", rev = "d7d117f" }
 
-[lints.clippy]
+[workspace.lints.clippy]
 # transformed from https://github.com/EmbarkStudios/rust-ecosystem/blob/main/lints.rs
 all = "warn"
 await_holding_lock = "warn"
@@ -160,7 +160,7 @@ zero_sized_map_values = "warn"
 too_many_arguments = "allow"
 type_complexity = "allow"
 
-[lints.rust]
+[workspace.lints.rust]
 # transformed from https://github.com/EmbarkStudios/rust-ecosystem/blob/main/lints.rs
 unsafe_code = "deny"
 future_incompatible = "warn"

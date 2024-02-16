@@ -12,3 +12,6 @@ version.workspace = true
 [dependencies]
 biodome = "0.2.1"
 cti_constants.workspace = true
+
+[lints]
+workspace = true

@@ -12,3 +12,6 @@ version.workspace = true
 [dependencies]
 cti_types.workspace = true
 rpmalloc.workspace = true
+
+[lints]
+workspace = true

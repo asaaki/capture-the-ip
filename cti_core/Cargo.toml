@@ -60,3 +60,6 @@ tower-helmet.workspace = true
 [target.'cfg(target_os = "linux")'.dependencies]
 nix = { version = "0.27.1", features = ["user"] }
 privdrop = "0.5.4"
+
+[lints]
+workspace = true

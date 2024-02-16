@@ -11,3 +11,6 @@ version.workspace = true
 
 [dependencies]
 diesel.workspace = true
+
+[lints]
+workspace = true

@@ -37,6 +37,7 @@ pub extern "C" fn run(mode: RunMode) -> u8 {
 fn run_async(mode: RunMode) -> AppResult {
     let _guard = sentry::init((environment::sentry_dsn(), sentry::ClientOptions {
         release: sentry::release_name!(),
+        traces_sample_rate: 0.5, // percentage
         ..Default::default()
     }));
     sentry::capture_message("New instance starting ...", sentry::Level::Info);
