@@ -53,9 +53,9 @@ deploy:
 
 # fly scale count 1 --region fra
 # fly scale count 1 --region iad
-# fly scale count 1 --region lax
+# fly scale count 1 --region sjc
 scale:
-	fly scale count 3 --max-per-region 1 --region fra,iad,lax
+	fly scale count 3 --max-per-region 1 --region fra,iad,sjc
 
 # docker image
 
