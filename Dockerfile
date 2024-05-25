@@ -23,9 +23,10 @@ COPY --link --from=ghcr.io/markentier/utilities:all-in-one /usr/bin/magicpak /us
 COPY --link --from=ghcr.io/markentier/utilities:all-in-one /usr/bin/upx /usr/bin/upx
 COPY --link --from=ghcr.io/markentier/utilities:all-in-one /usr/bin/sccache /usr/bin/sccache
 
-ENV SCCACHE_DIR=/tmp/sccache \
-    SCCACHE_CACHE_SIZE=2G \
-    SCCACHE_ERROR_LOG=/tmp/sccache.log
+# ENV SCCACHE_DIR=/tmp/sccache \
+#     SCCACHE_SERVER_PORT=4242 \
+#     SCCACHE_CACHE_SIZE=2G \
+#     SCCACHE_ERROR_LOG=/tmp/sccache.log
 
 # # comment this if you want to not use sccache for building
 # ENV CARGO_INCREMENTAL=0 \
@@ -48,16 +49,20 @@ WORKDIR /app
 COPY . .
 
 RUN rustc --version --verbose && \
-    cargo --version --verbose
+    cargo --version --verbose && \
+    sccache --version
 
 RUN echo "CURRENT RUSTFLAGS=${RUSTFLAGS}"
+
+RUN sccache --start-server
 
 RUN \
   --mount=type=cache,target=/usr/local/cargo/registry \
   --mount=type=cache,target=/app/target \
+  --mount=type=cache,target=/tmp/sccache \
+    mkdir -p /app/bin && \
     cargo build --release -p cti_core && \
     cargo build --release --bins && \
-    mkdir -p /app/bin && \
     cp /app/target/release/libcti_core.so /lib/ ; \
     cp /app/target/release/cti_* /app/bin/
 
