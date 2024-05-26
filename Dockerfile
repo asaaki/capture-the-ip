@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1-labs
 
-FROM rust:1.76.0-bookworm as builder
+FROM rust:1.78.0-bookworm as builder
 
 ARG RUSTFLAGS
 
