@@ -28,7 +28,6 @@ axum-prometheus.workspace = true
 concat-idents.workspace = true
 deadpool.workspace = true
 deadpool-diesel.workspace = true
-deadpool-sync.workspace = true
 diesel.workspace = true
 diesel-async.workspace = true
 fakedata_generator.workspace = true
