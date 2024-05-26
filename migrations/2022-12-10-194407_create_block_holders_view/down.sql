@@ -1,1 +1,1 @@
-drop materialized view block_holders;
+DROP MATERIALIZED VIEW block_holders;

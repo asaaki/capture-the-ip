@@ -1,5 +1,5 @@
-create table timestamps (
+CREATE TABLE timestamps (
     -- https://www.postgresql.org/docs/current/datatype-character.html
-    id varchar(126) primary key,
-    stamped_at timestamp not null
+    id VARCHAR(126) PRIMARY KEY,
+    stamped_at TIMESTAMP NOT NULL
 );

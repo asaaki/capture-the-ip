@@ -1,27 +1,32 @@
 -- refresh materialized view user_ranking;
 
-create materialized view user_ranking as
-with block_claims as (
-    select
+CREATE MATERIALIZED VIEW user_ranking AS
+WITH block_claims AS (
+    SELECT
         nick,
         blck,
-        count(ip) as claims,
-        (rank() over (partition by blck order by count(ip) desc))::integer as rank
-    from captures
-    group by nick, blck
+        COUNT(ip) AS claims,
+        (rank() OVER (PARTITION BY blck ORDER BY COUNT(ip) DESC))::integer AS rank
+    FROM captures
+    GROUP BY nick, blck
 ),
-max_rank as (
-    select blck, max(rank)::integer as max_rank
-    from block_claims
-	group by blck
+max_rank AS (
+    SELECT blck, max(rank)::integer AS max_rank
+    FROM block_claims
+	GROUP BY blck
 ),
-ties as (
-    select blck, rank, (case when count(nick) > 1 then true else false end) as is_tied
-    from block_claims
-    group by blck, rank
+ties AS (
+    SELECT blck, rank, (CASE WHEN COUNT(nick) > 1 THEN true ELSE false END) AS is_tied
+    FROM block_claims
+    GROUP BY blck, rank
 )
-select b.blck, b.rank, m.max_rank, t.is_tied, b.claims, b.nick
-from block_claims b
-join max_rank m on b.blck = m.blck
-join ties t on b.blck = t.blck and b.rank = t.rank
-order by b.blck asc, b.rank asc;
+SELECT b.blck, b.rank, m.max_rank, t.is_tied, b.claims, b.nick
+FROM block_claims b
+JOIN max_rank m ON b.blck = m.blck
+JOIN ties t ON b.blck = t.blck AND b.rank = t.rank
+ORDER BY b.blck ASC, b.rank ASC;
+
+ALTER MATERIALIZED VIEW user_ranking SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW user_ranking SET (autovacuum_vacuum_threshold = 5000);
+ALTER MATERIALIZED VIEW user_ranking SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW user_ranking SET (autovacuum_analyze_threshold = 5000);

@@ -1,22 +1,27 @@
 -- refresh materialized view block_holders;
 
-create materialized view block_holders as
-with block_claims as (
-    select
+CREATE materialized view block_holders AS
+WITH block_claims AS (
+    SELECT
         nick,
         blck,
-        count(ip) as claims,
-        (rank() over (partition by blck order by count(ip) desc))::integer as rank
-    from captures
-    group by nick, blck
+        COUNT(ip) AS claims,
+        (rank() OVER (PARTITION BY blck ORDER BY count(ip) DESC))::integer AS rank
+    FROM captures
+    GROUP BY nick, blck
 ),
-ties as (
-    select blck, rank, (case when count(nick) > 1 then true else false end) as is_tied
-    from block_claims
-    group by blck, rank
+ties AS (
+    SELECT blck, rank, (CASE WHEN count(nick) > 1 THEN true ELSE false END) AS is_tied
+    FROM block_claims
+    GROUP BY blck, rank
 )
-select distinct b.blck, t.is_tied, (case when t.is_tied then 'tied' else b.nick end) as nick, b.claims
-from block_claims b
-join ties t on b.blck = t.blck and b.rank = t.rank
-where b.rank = 1
-order by b.blck asc;
+SELECT DISTINCT b.blck, t.is_tied, (CASE WHEN t.is_tied THEN 'tied' ELSE b.nick END) AS nick, b.claims
+FROM block_claims b
+JOIN ties t ON b.blck = t.blck AND b.rank = t.rank
+WHERE b.rank = 1
+ORDER BY b.blck ASC;
+
+ALTER MATERIALIZED VIEW block_holders SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW block_holders SET (autovacuum_vacuum_threshold = 5000);
+ALTER MATERIALIZED VIEW block_holders SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW block_holders SET (autovacuum_analyze_threshold = 5000);

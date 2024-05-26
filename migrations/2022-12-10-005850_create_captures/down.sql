@@ -1,4 +1,4 @@
-drop index captures_by_block;
-drop index captures_by_claimed_at;
-drop index captures_by_nick;
-drop table captures;
+DROP INDEX captures_by_block;
+DROP INDEX captures_by_claimed_at;
+DROP INDEX captures_by_nick;
+DROP TABLE captures;

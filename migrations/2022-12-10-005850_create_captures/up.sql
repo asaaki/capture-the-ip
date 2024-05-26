@@ -1,9 +1,14 @@
-create table captures (
-    ip integer primary key, -- 32 bit value
-    blck smallint not null, -- 16 bit value
-    nick text not null,
-    claimed_at timestamp not null default CURRENT_TIMESTAMP
+CREATE TABLE captures (
+    ip INTEGER PRIMARY KEY, -- 32 bit value
+    blck SMALLINT NOT NULL, -- 16 bit value
+    nick TEXT NOT NULL,
+    claimed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-create index captures_by_nick on captures (nick) include (ip, blck, claimed_at);
-create index captures_by_claimed_at on captures (claimed_at DESC) include (ip, nick);
-create index captures_by_block on captures (blck ASC) include (ip, nick);
+CREATE INDEX captures_by_nick ON captures (nick) INCLUDE (ip, blck, claimed_at);
+CREATE INDEX captures_by_claimed_at ON captures (claimed_at DESC) INCLUDE (ip, nick);
+CREATE INDEX captures_by_block ON captures (blck ASC) INCLUDE (ip, nick);
+
+ALTER TABLE captures SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER TABLE captures SET (autovacuum_vacuum_threshold = 5000);
+ALTER TABLE captures SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER TABLE captures SET (autovacuum_analyze_threshold = 5000);

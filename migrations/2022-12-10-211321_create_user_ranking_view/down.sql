@@ -1,1 +1,1 @@
-drop materialized view user_ranking;
+DROP MATERIALIZED VIEW user_ranking;

@@ -1,1 +1,1 @@
-drop table timestamps;
+DROP TABLE timestamps;

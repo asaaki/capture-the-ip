@@ -13,221 +13,253 @@ refresh materialized view ranking_hour;
 
 -- TOP ALL TIME
 
-create materialized view ranking_all_time as
-with block_claims as (
-    select nick, blck, claims
-    from (
-        select
+CREATE MATERIALIZED VIEW ranking_all_time AS
+WITH block_claims AS (
+    SELECT nick, blck, claims
+    FROM (
+        SELECT
             nick,
             blck,
-            count(ip) as claims,
-            rank() over (partition by blck order by count(ip) desc) as rank
-        from captures
-        group by nick, blck
+            count(ip) AS claims,
+            rank() OVER (PARTITION BY blck ORDER BY count(ip) DESC) AS rank
+        FROM captures
+        GROUP BY nick, blck
     ) block_claims
-    where rank = 1
-    order by blck asc
+    WHERE rank = 1
+    ORDER BY blck ASC
 ),
-ties as (
-    select blck
-    from block_claims
-    group by blck
-    having count(*) > 1
+ties AS (
+    SELECT blck
+    FROM block_claims
+    GROUP BY blck
+    HAVING COUNT(*) > 1
 ),
-filtered as (
-    select *
-    from block_claims
-    where blck not in (select * from ties)
+filtered AS (
+    SELECT *
+    FROM block_claims
+    WHERE blck NOT IN (SELECT * FROM ties)
 ),
-results as (
-    select nick, array_agg(blck order by blck asc) as blocks, sum(claims)::bigint as total_claims
-    from filtered
-    group by nick
+results AS (
+    SELECT nick, array_agg(blck ORDER BY blck ASC) AS blocks, sum(claims)::bigint AS total_claims
+    FROM filtered
+    GROUP BY nick
 )
-select * from results
-order by array_length(blocks, 1) desc, total_claims desc;
+SELECT * FROM results
+ORDER BY array_length(blocks, 1) DESC, total_claims DESC;
 
 -- TOP YEAR
 
-create materialized view ranking_year as
-with block_claims as (
-    select nick, blck, claims
-    from (
-        select
+CREATE MATERIALIZED VIEW ranking_year AS
+WITH block_claims AS (
+    SELECT nick, blck, claims
+    FROM (
+        SELECT
             nick,
             blck,
-            count(ip) as claims,
-            rank() over (partition by blck order by count(ip) desc) as rank
-        from captures
-        where claimed_at >= now() - interval '1 year'
-        group by nick, blck
+            count(ip) AS claims,
+            rank() OVER (PARTITION BY blck ORDER BY count(ip) DESC) AS rank
+        FROM captures
+        WHERE claimed_at >= now() - interval '1 year'
+        GROUP BY nick, blck
     ) block_claims
-    where rank = 1
-    order by blck asc
+    WHERE rank = 1
+    ORDER BY blck ASC
 ),
-ties as (
-    select blck
-    from block_claims
-    group by blck
-    having count(*) > 1
+ties AS (
+    SELECT blck
+    FROM block_claims
+    GROUP BY blck
+    HAVING COUNT(*) > 1
 ),
-filtered as (
-    select *
-    from block_claims
-    where blck not in (select * from ties)
+filtered AS (
+    SELECT *
+    FROM block_claims
+    WHERE blck NOT IN (SELECT * FROM ties)
 ),
-results as (
-    select nick, array_agg(blck order by blck asc) as blocks, sum(claims)::bigint as total_claims
-    from filtered
-    group by nick
+results AS (
+    SELECT nick, array_agg(blck ORDER BY blck ASC) AS blocks, sum(claims)::bigint AS total_claims
+    FROM filtered
+    GROUP BY nick
 )
-select * from results
-order by array_length(blocks, 1) desc, total_claims desc;
+SELECT * FROM results
+ORDER BY array_length(blocks, 1) DESC, total_claims DESC;
 
 -- TOP MONTH
 
-create materialized view ranking_month as
-with block_claims as (
-    select nick, blck, claims
-    from (
-        select
+CREATE MATERIALIZED VIEW ranking_month AS
+WITH block_claims AS (
+    SELECT nick, blck, claims
+    FROM (
+        SELECT
             nick,
             blck,
-            count(ip) as claims,
-            rank() over (partition by blck order by count(ip) desc) as rank
-        from captures
-        where claimed_at >= now() - interval '1 month'
-        group by nick, blck
+            count(ip) AS claims,
+            rank() OVER (PARTITION BY blck ORDER BY count(ip) DESC) AS rank
+        FROM captures
+        WHERE claimed_at >= now() - interval '1 month'
+        GROUP BY nick, blck
     ) block_claims
-    where rank = 1
-    order by blck asc
+    WHERE rank = 1
+    ORDER BY blck ASC
 ),
-ties as (
-    select blck
-    from block_claims
-    group by blck
-    having count(*) > 1
+ties AS (
+    SELECT blck
+    FROM block_claims
+    GROUP BY blck
+    HAVING COUNT(*) > 1
 ),
-filtered as (
-    select *
-    from block_claims
-    where blck not in (select * from ties)
+filtered AS (
+    SELECT *
+    FROM block_claims
+    WHERE blck NOT IN (SELECT * FROM ties)
 ),
-results as (
-    select nick, array_agg(blck order by blck asc) as blocks, sum(claims)::bigint as total_claims
-    from filtered
-    group by nick
+results AS (
+    SELECT nick, array_agg(blck ORDER BY blck ASC) AS blocks, sum(claims)::bigint AS total_claims
+    FROM filtered
+    GROUP BY nick
 )
-select * from results
-order by array_length(blocks, 1) desc, total_claims desc;
+SELECT * FROM results
+ORDER BY array_length(blocks, 1) DESC, total_claims DESC;
 
 -- TOP WEEK
 
-create materialized view ranking_week as
-with block_claims as (
-    select nick, blck, claims
-    from (
-        select
+CREATE MATERIALIZED VIEW ranking_week AS
+WITH block_claims AS (
+    SELECT nick, blck, claims
+    FROM (
+        SELECT
             nick,
             blck,
-            count(ip) as claims,
-            rank() over (partition by blck order by count(ip) desc) as rank
-        from captures
-        where claimed_at >= now() - interval '1 week'
-        group by nick, blck
+            count(ip) AS claims,
+            rank() OVER (PARTITION BY blck ORDER BY count(ip) DESC) AS rank
+        FROM captures
+        WHERE claimed_at >= now() - interval '1 week'
+        GROUP BY nick, blck
     ) block_claims
-    where rank = 1
-    order by blck asc
+    WHERE rank = 1
+    ORDER BY blck ASC
 ),
-ties as (
-    select blck
-    from block_claims
-    group by blck
-    having count(*) > 1
+ties AS (
+    SELECT blck
+    FROM block_claims
+    GROUP BY blck
+    HAVING COUNT(*) > 1
 ),
-filtered as (
-    select *
-    from block_claims
-    where blck not in (select * from ties)
+filtered AS (
+    SELECT *
+    FROM block_claims
+    WHERE blck NOT IN (SELECT * FROM ties)
 ),
-results as (
-    select nick, array_agg(blck order by blck asc) as blocks, sum(claims)::bigint as total_claims
-    from filtered
-    group by nick
+results AS (
+    SELECT nick, array_agg(blck ORDER BY blck ASC) AS blocks, sum(claims)::bigint AS total_claims
+    FROM filtered
+    GROUP BY nick
 )
-select * from results
-order by array_length(blocks, 1) desc, total_claims desc;
+SELECT * FROM results
+ORDER BY array_length(blocks, 1) DESC, total_claims DESC;
 
 -- TOP DAY
 
-create materialized view ranking_day as
-with block_claims as (
-    select nick, blck, claims
-    from (
-        select
+CREATE MATERIALIZED VIEW ranking_day AS
+WITH block_claims AS (
+    SELECT nick, blck, claims
+    FROM (
+        SELECT
             nick,
             blck,
-            count(ip) as claims,
-            rank() over (partition by blck order by count(ip) desc) as rank
-        from captures
-        where claimed_at >= now() - interval '1 day'
-        group by nick, blck
+            count(ip) AS claims,
+            rank() OVER (PARTITION BY blck ORDER BY count(ip) DESC) AS rank
+        FROM captures
+        WHERE claimed_at >= now() - interval '1 day'
+        GROUP BY nick, blck
     ) block_claims
-    where rank = 1
-    order by blck asc
+    WHERE rank = 1
+    ORDER BY blck ASC
 ),
-ties as (
-    select blck
-    from block_claims
-    group by blck
-    having count(*) > 1
+ties AS (
+    SELECT blck
+    FROM block_claims
+    GROUP BY blck
+    HAVING COUNT(*) > 1
 ),
-filtered as (
-    select *
-    from block_claims
-    where blck not in (select * from ties)
+filtered AS (
+    SELECT *
+    FROM block_claims
+    WHERE blck NOT IN (SELECT * FROM ties)
 ),
-results as (
-    select nick, array_agg(blck order by blck asc) as blocks, sum(claims)::bigint as total_claims
-    from filtered
-    group by nick
+results AS (
+    SELECT nick, array_agg(blck ORDER BY blck ASC) AS blocks, sum(claims)::bigint AS total_claims
+    FROM filtered
+    GROUP BY nick
 )
-select * from results
-order by array_length(blocks, 1) desc, total_claims desc;
+SELECT * FROM results
+ORDER BY array_length(blocks, 1) DESC, total_claims DESC;
 
 -- TOP HOUR
 
-create materialized view ranking_hour as
-with block_claims as (
-    select nick, blck, claims
-    from (
-        select
+CREATE MATERIALIZED VIEW ranking_hour AS
+WITH block_claims AS (
+    SELECT nick, blck, claims
+    FROM (
+        SELECT
             nick,
             blck,
-            count(ip) as claims,
-            rank() over (partition by blck order by count(ip) desc) as rank
-        from captures
-        where claimed_at >= now() - interval '1 hour'
-        group by nick, blck
+            count(ip) AS claims,
+            rank() OVER (PARTITION BY blck ORDER BY count(ip) DESC) AS rank
+        FROM captures
+        WHERE claimed_at >= now() - interval '1 hour'
+        GROUP BY nick, blck
     ) block_claims
-    where rank = 1
-    order by blck asc
+    WHERE rank = 1
+    ORDER BY blck ASC
 ),
-ties as (
-    select blck
-    from block_claims
-    group by blck
-    having count(*) > 1
+ties AS (
+    SELECT blck
+    FROM block_claims
+    GROUP BY blck
+    HAVING COUNT(*) > 1
 ),
-filtered as (
-    select *
-    from block_claims
-    where blck not in (select * from ties)
+filtered AS (
+    SELECT *
+    FROM block_claims
+    WHERE blck NOT IN (SELECT * FROM ties)
 ),
-results as (
-    select nick, array_agg(blck order by blck asc) as blocks, sum(claims)::bigint as total_claims
-    from filtered
-    group by nick
+results AS (
+    SELECT nick, array_agg(blck ORDER BY blck ASC) AS blocks, sum(claims)::bigint AS total_claims
+    FROM filtered
+    GROUP BY nick
 )
-select * from results
-order by array_length(blocks, 1) desc, total_claims desc;
+SELECT * FROM results
+ORDER BY array_length(blocks, 1) DESC, total_claims DESC;
+
+-- vacuum
+
+ALTER MATERIALIZED VIEW ranking_all_time SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW ranking_all_time SET (autovacuum_vacuum_threshold = 5000);
+ALTER MATERIALIZED VIEW ranking_all_time SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW ranking_all_time SET (autovacuum_analyze_threshold = 5000);
+
+ALTER MATERIALIZED VIEW ranking_day SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW ranking_day SET (autovacuum_vacuum_threshold = 5000);
+ALTER MATERIALIZED VIEW ranking_day SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW ranking_day SET (autovacuum_analyze_threshold = 5000);
+
+ALTER MATERIALIZED VIEW ranking_hour SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW ranking_hour SET (autovacuum_vacuum_threshold = 5000);
+ALTER MATERIALIZED VIEW ranking_hour SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW ranking_hour SET (autovacuum_analyze_threshold = 5000);
+
+ALTER MATERIALIZED VIEW ranking_month SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW ranking_month SET (autovacuum_vacuum_threshold = 5000);
+ALTER MATERIALIZED VIEW ranking_month SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW ranking_month SET (autovacuum_analyze_threshold = 5000);
+
+ALTER MATERIALIZED VIEW ranking_week SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW ranking_week SET (autovacuum_vacuum_threshold = 5000);
+ALTER MATERIALIZED VIEW ranking_week SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW ranking_week SET (autovacuum_analyze_threshold = 5000);
+
+ALTER MATERIALIZED VIEW ranking_year SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW ranking_year SET (autovacuum_vacuum_threshold = 5000);
+ALTER MATERIALIZED VIEW ranking_year SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER MATERIALIZED VIEW ranking_year SET (autovacuum_analyze_threshold = 5000);
