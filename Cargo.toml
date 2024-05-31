@@ -42,10 +42,10 @@ parking_lot = { version = "0.12.3", features = [] }
 rpmalloc = { version = "0.2.2", features = ["unlimited_cache", "adaptive_thread_cache"] }
 rustls-pemfile = "2.1.2"
 rustls = "0.23.8"
-sentry = {version = "0.32.1", default-features = false, features = ["backtrace", "contexts", "panic", "transport", "anyhow", "debug-images", "ureq", "tracing"] }
-serde = { version = "1.0.196", features = ["derive"] }
-time = { version = "0.3.34", features = ["serde", "formatting"] }
-tokio = "1.37.0"
+sentry = {version = "0.33.0", default-features = false, features = ["backtrace", "contexts", "panic", "transport", "anyhow", "debug-images", "ureq", "tracing"] }
+serde = { version = "1.0.203", features = ["derive"] }
+time = { version = "0.3.36", features = ["serde", "formatting"] }
+tokio = "1.38.0"
 tokio-graceful-shutdown = "0.13.0" # needs heavy refactoring!
 tokio-postgres = "0.7.10"
 tokio-postgres-rustls = "0.12.0"

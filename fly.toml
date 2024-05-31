@@ -8,49 +8,62 @@ primary_region = "fra"
 kill_signal = "SIGINT"
 kill_timeout = "16s"
 
-[experimental]
-  auto_rollback = true
+[deploy]
+strategy = "canary"
 
 [build]
-  dockerfile = "Dockerfile"
-  build-target = "production"
+dockerfile = "Dockerfile"
+build-target = "production"
 
 [build.args]
-  # https://community.fly.io/t/vcvttsd2usi-illegal-instruction-on-fly-io-but-not-locally-or-on-github-ci/5713/2
-  RUSTFLAGS = "-Clink-arg=-fuse-ld=mold -Ctarget-cpu=znver2"
+# https://community.fly.io/t/vcvttsd2usi-illegal-instruction-on-fly-io-but-not-locally-or-on-github-ci/5713/2
+RUSTFLAGS = "-Clink-arg=-fuse-ld=mold -Ctarget-cpu=znver2"
 
 [env]
-  DATABASE_POOL_SIZE = "20"
-  HOST_IP = "0.0.0.0"
-  PORT = "3000"
-  RUST_BACKTRACE = "full"
-  RUST_LOG = "info"
+DATABASE_POOL_SIZE = "20"
+HOST_IP = "0.0.0.0"
+PORT = "3000"
+RUST_BACKTRACE = "full"
+RUST_LOG = "info"
 
 [metrics]
-    port = 3000
-    path = "/metrics"
+port = 3000
+path = "/metrics"
 
 [[services]]
-  protocol = "tcp"
-  internal_port = 3000
-  processes = ["app"]
-  concurrency.type = "connections"
-  concurrency.hard_limit = 2000
-  concurrency.soft_limit = 1000
+protocol = "tcp"
+internal_port = 3000
+processes = ["app"]
+concurrency.type = "connections"
+concurrency.hard_limit = 2000
+concurrency.soft_limit = 1000
 
-  [[services.ports]]
-    port = 80
-    handlers = ["http"]
-    force_https = true
+[[services.ports]]
+port = 80
+handlers = ["http"]
+force_https = true
 
-  [[services.ports]]
-    port = 443
-    handlers = ["tls", "http"]
-    tls_options.alpn = ["h2", "http/1.1"]
-    tls_options.versions = ["TLSv1.2", "TLSv1.3"]
+[[services.ports]]
+port = 443
+handlers = ["tls", "http"]
+tls_options.alpn = ["h2", "http/1.1"]
+tls_options.versions = ["TLSv1.2", "TLSv1.3"]
 
-  [[services.tcp_checks]]
-    interval = "15s"
-    timeout = "2s"
-    grace_period = "1s"
-    restart_limit = 3
+[services.ports.http_options.response]
+pristine = true
+
+[services.ports.http_options.response.headers]
+# Example-Header = false
+unicorn = "power"
+
+[[services.tcp_checks]]
+interval = "15s"
+timeout = "2s"
+grace_period = "1s"
+restart_limit = 3
+
+[[vm]]
+size = "shared-cpu-1x"
+# cpu_kind = "shared"
+# cpu = "1"
+memory = "256MB"
